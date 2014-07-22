@@ -36,6 +36,13 @@ subtest basics => sub {
         result      => [qw/--str/],
     );
     test_complete(
+        name        => 'option name after a flag option',
+        args        => {getopt_spec=>\%gospec, },
+        comp_line0  => 'CMD --flag1 ^',
+        result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
+                           --nobool --str -F -S -f/],
+    );
+    test_complete(
         name        => 'option value without completion',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD --str ^',

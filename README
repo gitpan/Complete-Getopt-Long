@@ -3,11 +3,11 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.01 of Complete::Getopt::Long (from
+    This document describes version 0.02 of Complete::Getopt::Long (from
     Perl distribution Complete-Getopt-Long), released on 2014-07-22.
 
 SYNOPSIS
-    See Getopt::Long::WithComp for an easy way to use this module.
+    See Getopt::Long::Complete for an easy way to use this module.
 
 DESCRIPTION
 FUNCTIONS
@@ -86,6 +86,8 @@ FUNCTIONS
     format the result of this function for bash.
 
 SEE ALSO
+    Getopt::Long::Complete
+
     Complete
 
     Complete::Bash

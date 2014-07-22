@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-22'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use strict;
@@ -181,6 +181,7 @@ sub complete_cli_arg {
                 }
                 $what = +($words->[$i] // '') =~ /\A-/ ?
                     'optname' : 'optname,arg';
+                $i++;
                 next OPT;
             } else {
                 # assume nonexisting option to be with no value
@@ -244,11 +245,11 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.01 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-22.
+This document describes version 0.02 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-22.
 
 =head1 SYNOPSIS
 
-See L<Getopt::Long::WithComp> for an easy way to use this module.
+See L<Getopt::Long::Complete> for an easy way to use this module.
 
 =head1 DESCRIPTION
 
@@ -336,6 +337,8 @@ You can use `format_completion` function in `Complete::Bash` module to format
 the result of this function for bash.
 
 =head1 SEE ALSO
+
+L<Getopt::Long::Complete>
 
 L<Complete>
 
