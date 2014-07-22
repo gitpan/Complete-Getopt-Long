@@ -1,0 +1,122 @@
+NAME
+    Complete::Getopt::Long - Complete command-line argument using
+    Getopt::Long specification
+
+VERSION
+    This document describes version 0.01 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-07-22.
+
+SYNOPSIS
+    See Getopt::Long::WithComp for an easy way to use this module.
+
+DESCRIPTION
+FUNCTIONS
+  complete_cli_arg(%args) -> array|hash
+    Complete command-line argument using Getopt::Long specification.
+
+    Examples:
+
+     complete_cli_arg(
+       cword => 0,
+       getopt_spec => {
+         "arg1|a=s" => sub { ... },
+         "arg2|b=s" => sub { ... },
+         "help|h"   => sub { ... },
+       },
+       words => []
+     );
+
+    Result: "["--arg1", "--arg2", "--help", "-a", "-b", "-h"]".
+
+    This routine can complete option names, where the option names are
+    retrieved from "Getopt::Long" specification. If you provide completion
+    hints in "hints", you can also complete option *values* and *arguments*.
+
+    Arguments ('*' denotes required arguments):
+
+    *   completion => *hash*
+
+        Completion routines for complete option values/arguments.
+
+        The keys are option spec, like in "getopt_spec". To refer to
+        arguments, use '' (empty string). The values are either arrayrefs
+        (to specify valid values) or a coderefs to supply custom completion.
+        Completion code will receive a hash of arguments containing these
+        keys: "word" (word to be completed) and is expected to return a
+        completion reply in the form of array. The various "complete_*"
+        function like those in "Complete::Util" or the other "Complete::*"
+        modules are suitable to use here. Example:
+
+         require Complete::Unix;
+         complete_cli_arg(
+             getopt_spec =E<gt> {
+                 'help|h'   =E<gt> sub{...},
+                 'format=s' =E<gt> \$fmt,
+                 'user=s'   =E<gt> \$user,
+             },
+             completion  =E<gt> {
+                 'format=s' =E<gt> ['json', 'text', 'xml', 'yaml'],
+                 'user=s'   =E<gt> \&Complete::Unix::complete_user,
+             },
+         );
+
+    *   cword* => *int*
+
+        Index in words of the word we're trying to complete.
+
+        See function "parse_cmdline" in "Complete::Bash" on how to produce
+        this (if you're using bash).
+
+    *   getopt_spec* => *hash*
+
+        Getopt::Long specification.
+
+    *   words* => *array*
+
+        Command line, already broken into words.
+
+        See function "parse_cmdline" in "Complete::Bash" on how to produce
+        this (if you're using bash).
+
+    Return value:
+
+     (any)
+
+    You can use `format_completion` function in `Complete::Bash` module to
+    format the result of this function for bash.
+
+SEE ALSO
+    Complete
+
+    Complete::Bash
+
+    Other modules related to bash shell tab completion: Bash::Completion,
+    Getopt::Complete.
+
+    Perinci::CmdLine - an alternative way to easily create command-line
+    applications with completion feature.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Getopt-Long>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
