@@ -22,18 +22,18 @@ my %WriteMakefileArgs = (
   "NAME" => "Complete::Getopt::Long",
   "PREREQ_PM" => {
     "Complete::Util" => 0,
-    "Getopt::Long::Util" => 0,
+    "Getopt::Long::Util" => "0.77",
     "List::MoreUtils" => 0,
     "Rinci" => "v1.1.0"
   },
   "TEST_REQUIRES" => {
-    "Complete::Bash" => 0,
+    "Complete::Bash" => "0.07",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,10 +41,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Bash" => 0,
+  "Complete::Bash" => "0.07",
   "Complete::Util" => 0,
   "File::Spec" => 0,
-  "Getopt::Long::Util" => 0,
+  "Getopt::Long::Util" => "0.77",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,

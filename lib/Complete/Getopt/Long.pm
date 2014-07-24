@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-07-22'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2014-07-24'; # DATE
+our $VERSION = '0.03'; # VERSION
 
 use 5.010001;
 use strict;
@@ -128,6 +128,7 @@ sub complete_cli_arg {
 
     my $words  = $args{words} or die "Please specify words";
     defined(my $cword = $args{cword}) or die "Please specify cword";
+    #say "D:words=", join(", ", @$words);
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
     my $comps = $args{completion};
 
@@ -154,19 +155,35 @@ sub complete_cli_arg {
 
     my $opt;
     my $what = 'optname,arg';
+    my $lastopt;
     my $ohash;
     my $i = 0;
+    my $word;
   OPT:
     while ($i < $cword) {
-        my $word = $words->[$i] // '';
-        if ($word eq '--') {
+        my $w = $words->[$i] // '';
+        #say "D:i=$i, w=$w, cword=$cword, remaining=[".join(", ", @{$words}[$i+1..@$words-1])."]";
+        if ($w eq '--') {
             $what = 'arg';
             last OPT;
         }
+        # should always be the case
         if ($what =~ /optname/) {
-            # should always be the case
-            if ($opts{$word}) {
-                $ohash = $opts{$word};
+            # --foo^=, --foo=^, or --foo= ^
+            if ($i+1 <= @$words && ($words->[$i+1] // '') eq '=') {
+                if ($i+2 >= $cword) {
+                    if ($i+1 == $cword) {
+                        $word = '';
+                    }
+                    $ohash = $opts{$w};
+                    return [] unless $ohash;
+                    $what = 'optval';
+                    last OPT;
+                }
+                $i+=2;
+                next;
+            } elsif ($opts{$w}) {
+                $ohash = $opts{$w};
                 $what = 'optval';
                 $i += $ohash->{min_vals};
                 last OPT if $i >= $cword;
@@ -192,7 +209,9 @@ sub complete_cli_arg {
     }
 
     my @res;
-    my $word = $words->[$cword] // '';
+    $word //= $words->[$cword] // '';
+    #say "D:---";
+    #say "D:word=$word, what=$what";
     if ($what =~ /optname/) {
         push @res, @{ Complete::Util::complete_array_elem(
             array => \@optnames, word => $word) };
@@ -245,7 +264,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.02 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-22.
+This document describes version 0.03 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-24.
 
 =head1 SYNOPSIS
 

@@ -35,6 +35,13 @@ subtest basics => sub {
         comp_line0  => 'CMD --str^',
         result      => [qw/--str/],
     );
+    # fudged
+    #test_complete(
+    #    name        => 'option name (4)',
+    #    args        => {getopt_spec=>\%gospec, },
+    #    comp_line0  => 'CMD --str=^',
+    #    result      => [qw/--str/],
+    #);
     test_complete(
         name        => 'option name after a flag option',
         args        => {getopt_spec=>\%gospec, },
@@ -49,6 +56,18 @@ subtest basics => sub {
         result      => [qw//],
     );
     test_complete(
+        name        => 'option value for unknown option',
+        args        => {getopt_spec=>\%gospec, },
+        comp_line0  => 'CMD --foo=^',
+        result      => [qw//],
+    );
+    test_complete(
+        name        => 'option value for option that does not expect value',
+        args        => {getopt_spec=>\%gospec, },
+        comp_line0  => 'CMD --flag1=^',
+        result      => [qw//],
+    );
+    test_complete(
         name        => 'option value with array completion',
         args        => {getopt_spec=>\%gospec,
                         completion=>{'str|S=s'=>[qw/aa a b c/]}},
@@ -60,6 +79,13 @@ subtest basics => sub {
         args        => {getopt_spec=>\%gospec,
                         completion=>{'str|S=s'=>[qw/aa a b c/]}},
         comp_line0  => 'CMD --str a^',
+        result      => [qw/a aa/],
+    );
+    test_complete(
+        name        => 'option value with array completion using =',
+        args        => {getopt_spec=>\%gospec,
+                        completion=>{'str|S=s'=>[qw/aa a b c/]}},
+        comp_line0  => 'CMD --str=a^',
         result      => [qw/a aa/],
     );
     test_complete(
@@ -116,7 +142,7 @@ sub test_complete {
 
         require Complete::Bash;
         my ($words, $cword) = @{ Complete::Bash::parse_cmdline(
-            $comp_line, $comp_point) };
+            $comp_line, $comp_point, '=') };
 
         require Complete::Getopt::Long;
         my $res = Complete::Getopt::Long::complete_cli_arg(

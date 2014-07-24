@@ -30,7 +30,7 @@
       "runtime" : {
          "requires" : {
             "Complete::Util" : "0",
-            "Getopt::Long::Util" : "0",
+            "Getopt::Long::Util" : "0.77",
             "List::MoreUtils" : "0",
             "Rinci" : "v1.1.0",
             "perl" : "5.010001"
@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "Complete::Bash" : "0",
+            "Complete::Bash" : "0.07",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/sharyanto/perl-Complete-Getopt-Long"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018001"
