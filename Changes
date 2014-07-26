@@ -1,5 +1,18 @@
 Revision history for Complete-Getopt-Long
 
+0.04    2014-07-26 (SHARYANTO)
+
+        - Change algorithm so things become simpler.
+
+        - Now does not repeat mentioned non-repeatable option names (including
+          aliases and abbreviated), e.g. when you have getopt_spec =>
+          {'help|h'=>sub{}, 'hour=i'=>sub{}, 'foo=s'=>\@ary}, then if cmdline is
+          (^ marks the point of completion) '--he --h^' or '-h --h^' then it
+          will complete to ['--hour'] only because '--help' has been mentioned.
+          But repeatable option can be repeated, e.g. '--foo --^' will complete
+          to ['--foo', '--help', '--hour'].
+
+
 0.03    2014-07-24 (SHARYANTO)
 
         - Handle equal sign (--foo=<tab>).

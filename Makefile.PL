@@ -27,13 +27,13 @@ my %WriteMakefileArgs = (
     "Rinci" => "v1.1.0"
   },
   "TEST_REQUIRES" => {
-    "Complete::Bash" => "0.07",
+    "Complete::Bash" => "0.09",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Bash" => "0.07",
+  "Complete::Bash" => "0.09",
   "Complete::Util" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Util" => "0.77",
