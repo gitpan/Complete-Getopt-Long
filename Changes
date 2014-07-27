@@ -1,5 +1,16 @@
 Revision history for Complete-Getopt-Long
 
+0.11    2014-07-28 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Support completion of bundled short options.
+
+        - Provide 'nth' argument for completion routine, so it can know that an
+          option has been given n times (e.g. in '--foo 1 --foo ^' the first foo
+          has nth=0, the second nth=1).
+
+
 0.10    2014-07-27 (SHARYANTO)
 
         - Some fixes.
