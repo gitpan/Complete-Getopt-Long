@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-26'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,17 +15,40 @@ our @EXPORT_OK = qw(
 
 our %SPEC;
 
-# return the key/element if $opt expands unambiguously to exactly one
-# key/element in $opts (which can be a hash or array), otherwise return undef.
-# e.g. _expand1('--fo', [qw/--foo --bar --baz/]) is true, but _expand1('--ba',
-# ...) or _expand1('--qux', ...) are undef.
+sub _default_fallback_completion {
+    my %args = @_;
+    my $word = $args{word} // '';
+    if ($word =~ /\A\$/) {
+        return Complete::Util::complete_env(word=>$word, ci=>$args{ci});
+    }
+    if ($word =~ /\A~/) {
+        require Complete::Unix;
+        $word =~ s/\A~//;
+        return [
+            map {"~$_"}
+                @{ Complete::Unix::complete_user(word=>$word, ci=>$args{ci}) }
+        ];
+    }
+    require String::Wildcard::Bash;
+    if (String::Wildcard::Bash::contains_wildcard($word)) {
+        return {completion=>[glob($word)], path_sep=>'/'};
+    }
+    return {completion=>Complete::Util::complete_file(word=>$word), path_sep=>'/'};
+};
+
+# return the key/element if $opt matches exactly a key/element in $opts (which
+# can be an array/hash) OR expands unambiguously to exactly one key/element in
+# $opts, otherwise return undef. e.g. _expand1('--fo', [qw/--foo --bar --baz
+# --fee --feet/]) and _expand('--fee') is true, but _expand1('--ba', ...) or
+# _expand1('--qux', ...) are undef.
 sub _expand1 {
     my ($opt, $opts) = @_;
     my @candidates;
     my $is_hash = ref($opts) eq 'HASH';
-    for ($is_hash ? (keys %$opts) : @$opts) {
+    for ($is_hash ? (sort {length($a)<=>length($b)} keys %$opts) : @$opts) {
         next unless index($_, $opt) == 0;
         push @candidates, $is_hash ? $opts->{$_} : $_;
+        last if $opt eq $_;
     }
     return @candidates == 1 ? $candidates[0] : undef;
 }
@@ -88,6 +111,16 @@ suitable to use here. Example:
 _
             schema      => 'hash*',
         },
+        fallback_completion => {
+            description => <<'_',
+
+If completion routine for a certain option or argument is not provided in
+`completion`, this fallback routine is used. The default, if this option is not
+specified, is to complete environment variables (`$FOO`) and files.
+
+_
+            schema => 'code*',
+        },
         words => {
             summary     => 'Command line arguments, like @ARGV',
             description => <<'_',
@@ -132,11 +165,12 @@ sub complete_cli_arg {
 
     my $words  = $args{words} or die "Please specify words";
     defined(my $cword = $args{cword}) or die "Please specify cword";
-    #say "D:words=", join(", ", @$words);
+    #say "D:words=", join(", ", @$words), ", cword=$cword";
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
     my $comps = $args{completion};
+    my $fbcomp = $args{fallback_completion} // \&_default_fallback_completion;
 
-    # parse all options first
+    # parse all options first & supply default completion routine
     my %opts;
     for my $ospec (keys %$gospec) {
         my $res = Getopt::Long::Util::parse_getopt_long_opt_spec($ospec)
@@ -231,7 +265,6 @@ sub complete_cli_arg {
                 }
             }
         } else {
-            $expects[$i]{optname} = '';
             $expects[$i]{arg} = 1;
         }
     }
@@ -268,10 +301,11 @@ sub complete_cli_arg {
         push @res, @{ Complete::Util::complete_array_elem(
             array => \@o, word => $word) };
     }
-    if (exists($exp->{optval}) && $comps) {
+    if (exists($exp->{optval})) {
         my $opt = $exp->{optval};
         my $opthash = $opts{$opt} if $opt;
         my $comp = $comps->{$opthash->{ospec}} if $opthash;
+        $comp //= $fbcomp;
         if (ref($comp) eq 'ARRAY') {
             push @res, @{ Complete::Util::complete_array_elem(
                 array => \@$comp, word => $word) };
@@ -287,7 +321,7 @@ sub complete_cli_arg {
     }
 
     if (exists($exp->{arg}) && $comps) {
-        my $comp = $comps->{''};
+        my $comp = $comps->{''} // $fbcomp;
         if (ref($comp) eq 'ARRAY') {
             push @res, @$comp;
         } elsif (ref($comp) eq 'CODE') {
@@ -319,7 +353,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.04 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-26.
+This document describes version 0.05 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-26.
 
 =head1 SYNOPSIS
 
@@ -373,6 +407,12 @@ Index in words of the word we're trying to complete.
 
 See function C<parse_cmdline> in C<Complete::Bash> on how to produce this (if
 you're using bash).
+
+=item * B<fallback_completion> => I<code>
+
+If completion routine for a certain option or argument is not provided in
+C<completion>, this fallback routine is used. The default, if this option is not
+specified, is to complete environment variables (C<$FOO>) and files.
 
 =item * B<getopt_spec>* => I<hash>
 

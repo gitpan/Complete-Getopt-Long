@@ -1,5 +1,16 @@
 Revision history for Complete-Getopt-Long
 
+0.05    2014-07-26 (SHARYANTO)
+
+        - Add option: fallback_completion.
+
+        - Provide default fallback_completion that can complete environment
+          variables ($foo), Unix usernames (~foo), wildcards (foo*), or
+          filenames.
+
+        - Other fixes.
+
+
 0.04    2014-07-26 (SHARYANTO)
 
         - Change algorithm so things become simpler.

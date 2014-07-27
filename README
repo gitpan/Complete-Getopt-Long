@@ -3,7 +3,7 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.04 of Complete::Getopt::Long (from
+    This document describes version 0.05 of Complete::Getopt::Long (from
     Perl distribution Complete-Getopt-Long), released on 2014-07-26.
 
 SYNOPSIS
@@ -52,6 +52,13 @@ FUNCTIONS
 
         See function "parse_cmdline" in "Complete::Bash" on how to produce
         this (if you're using bash).
+
+    *   fallback_completion => *code*
+
+        If completion routine for a certain option or argument is not
+        provided in "completion", this fallback routine is used. The
+        default, if this option is not specified, is to complete environment
+        variables ($FOO) and files.
 
     *   getopt_spec* => *hash*
 

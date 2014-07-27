@@ -19,7 +19,7 @@ subtest basics => sub {
     test_complete(
         name        => 'option name',
         args        => {getopt_spec=>\%gospec, },
-        comp_line0  => 'CMD ^',
+        comp_line0  => 'CMD -^',
         result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
                            --nobool --str -F -S -f/],
     );
@@ -38,14 +38,14 @@ subtest basics => sub {
     test_complete(
         name        => 'option name with mentioned non-repeatable option',
         args        => {getopt_spec=>\%gospec, },
-        comp_line0  => 'CMD --flag1 ^',
+        comp_line0  => 'CMD --flag1 -^',
         result      => [qw/--bool --flag2 --float --int --no-bool
                            --nobool --str -F -S -f/],
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option 2',
         args        => {getopt_spec=>\%gospec, },
-        comp_line0  => 'CMD ^  --flag1',
+        comp_line0  => 'CMD -^  --flag1',
         result      => [qw/--bool --flag2 --float --int --no-bool
                            --nobool --str -F -S -f/],
     );
@@ -57,10 +57,16 @@ subtest basics => sub {
                            --nobool --str -F -S/],
     );
     test_complete(
-        name        => 'option name with mentioned non-repeatable option 3 (alias)',
+        name        => 'option name with mentioned non-repeatable option 4 (alias)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD -f --f^', # means --flag1 is also mentioned
         result      => [qw/--flag1 --float/],
+    );
+    test_complete(
+        name        => 'option name with mentioned non-repeatable option 5',
+        args        => {getopt_spec=>{'--foo'=>sub{}, '--foot'=>sub{}}, },
+        comp_line0  => 'CMD --foo -^',
+        result      => [qw/--foot/],
     );
     my @foo;
     test_complete(
@@ -90,7 +96,7 @@ subtest basics => sub {
     # even though there's arg completion, /^-/ indicates that user wants to
     # complete option name
     test_complete(
-        name        => 'option name + arg completion',
+        name        => 'option name with arg completion',
         args        => {getopt_spec=>\%gospec,
                         completion=>{''=>sub { [qw/-x/] }}},
         comp_line0  => 'CMD -^',
@@ -154,16 +160,14 @@ subtest basics => sub {
     # XXX test option value with code completion returning hash
 
     test_complete(
-        name        => 'option name + arg',
+        name        => 'arg',
         args        => {getopt_spec=>\%gospec,
                         completion=>{''=>sub { [qw/aa a b c/] }}},
         comp_line0  => 'CMD ^',
-        result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
-                           --nobool --str -F -S -f a aa b c/],
+        result      => [qw/a aa b c/],
     );
 
     # XXX test arg with code completion returning hash
-    # XXX test option name + arg with code completion returning hash
 
     # XXX test optional value
 };
@@ -194,7 +198,10 @@ sub test_complete {
 
         require Complete::Getopt::Long;
         my $res = Complete::Getopt::Long::complete_cli_arg(
-            words=>$words, cword=>$cword, %{$args{args}},
+            words=>$words, cword=>$cword,
+            # we don't want to test default fallback completion yet
+            fallback_completion=>sub{[]},
+            %{$args{args}},
         );
         #use DD; dd { words=>$words, cword=>$cword, %{$args{args}} };
         is_deeply($res, $args{result}, "result") or diag explain($res);
