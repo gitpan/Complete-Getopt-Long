@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-27'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,7 +19,9 @@ sub _default_completion {
     my %args = @_;
     my $word = $args{word} // '';
     if ($word =~ /\A\$/) {
-        return Complete::Util::complete_env(word=>$word, ci=>$args{ci});
+        return {completion=>
+                    Complete::Util::complete_env(word=>$word, ci=>$args{ci}),
+                escmode=>'shellvar'};
     }
     if ($word =~ /\A~/) {
         require Complete::Unix;
@@ -366,7 +368,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.07 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
+This document describes version 0.08 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 =head1 SYNOPSIS
 
