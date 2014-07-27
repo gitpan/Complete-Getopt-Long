@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-27'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
@@ -74,8 +74,8 @@ $SPEC{complete_cli_arg} = {
     description => <<'_',
 
 This routine can complete option names, where the option names are retrieved
-from `Getopt::Long` specification. If you provide completion hints in `hints`,
-you can also complete option _values_ and _arguments_.
+from `Getopt::Long` specification. If you provide completion routine in
+`completion`, you can also complete _option values_ and _arguments_.
 
 _
     args => {
@@ -98,7 +98,7 @@ Completion code will receive a hash of arguments containing these keys:
 * `ospec` (str, Getopt::Long option spec, e.g. `str|S=s`; undef when completing
   argument)
 * `argpos` (int, argument position, zero-based; undef if completing option)
-* `parent_args`
+* `extras`
 * `seen_opts` (hash, all the options seen in `words`)
 
 and is expected to return a completion reply in the form of array. The various
@@ -131,7 +131,6 @@ Example:
     );
 
 _
-            schema      => 'hash*',
         },
         words => {
             summary     => 'Command line arguments, like @ARGV',
@@ -155,6 +154,10 @@ you're using bash).
 _
             schema      => 'int*',
             req         => 1,
+        },
+        extras => {
+            summary => 'To pass extra arguments to completion routines',
+            schema  => 'hash',
         },
     },
     result_naked => 1,
@@ -181,6 +184,7 @@ sub complete_cli_arg {
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
     my $comp0 = $args{completion};
     my $comp = $comp0 // &_default_completion;
+    my $extras = $args{extras};
 
     # before v0.06, completion is a hash, we'll support this for a while
     if (ref($comp) eq 'HASH') {
@@ -340,7 +344,7 @@ sub complete_cli_arg {
         my $opthash = $opts{$opt} if $opt;
         my %compargs = (
             type=>'optval', word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
-            argpos=>undef, parent_args=>\%args, seen_opts=>\%seen_opts,
+            argpos=>undef, extras=>$extras, seen_opts=>\%seen_opts,
         );
         my $compres = $comp->(%compargs);
         if (!defined $compres) {
@@ -357,7 +361,7 @@ sub complete_cli_arg {
     if (exists($exp->{arg})) {
         my %compargs = (
             type=>'arg', word=>$word, opt=>undef, ospec=>undef,
-            argpos=>$exp->{argpos}, parent_args=>\%args, seen_opts=>\%seen_opts,
+            argpos=>$exp->{argpos}, extras=>$extras, seen_opts=>\%seen_opts,
         );
         my $compres = $comp->(%compargs);
         if (!defined $compres) {
@@ -389,7 +393,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.09 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
+This document describes version 0.10 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 =head1 SYNOPSIS
 
@@ -405,14 +409,14 @@ See L<Getopt::Long::Complete> for an easy way to use this module.
 Complete command-line argument using Getopt::Long specification.
 
 This routine can complete option names, where the option names are retrieved
-from C<Getopt::Long> specification. If you provide completion hints in C<hints>,
-you can also complete option I<values> and I<arguments>.
+from C<Getopt::Long> specification. If you provide completion routine in
+C<completion>, you can also complete I<option values> and I<arguments>.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<completion> => I<hash>
+=item * B<completion> => I<code>
 
 Completion routine to complete option value/argument.
 
@@ -431,7 +435,7 @@ argument)
 
 =item * C<argpos> (int, argument position, zero-based; undef if completing option)
 
-=item * C<parent_args>
+=item * C<extras>
 
 =item * C<seen_opts> (hash, all the options seen in C<words>)
 
@@ -449,19 +453,19 @@ Example:
  use Complete::Unix qw(complete_user);
  use Complete::Util qw(complete_array_elem);
  complete_cli_arg(
-     getopt_spec =E<gt> {
-         'help|h'   =E<gt> sub{...},
-         'format=s' =E<gt> \$format,
-         'user=s'   =E<gt> \$user,
+     getopt_spec => {
+         'help|h'   => sub{...},
+         'format=s' => \$format,
+         'user=s'   => \$user,
      },
-     completion  =E<gt> sub {
+     completion  => sub {
          my %args  = @_;
          my $word  = $args{word};
          my $ospec = $args{ospec};
          if ($ospec && $ospec eq 'format=s') {
-             complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
+             complete_array(array=>[qw/json text xml yaml/], word=>$word);
          } else {
-             complete_user(word=E<gt>$word);
+             complete_user(word=>$word);
          }
      },
  );
@@ -472,6 +476,10 @@ Index in words of the word we're trying to complete.
 
 See function C<parse_cmdline> in C<Complete::Bash> on how to produce this (if
 you're using bash).
+
+=item * B<extras> => I<hash>
+
+To pass extra arguments to completion routines.
 
 =item * B<getopt_spec>* => I<hash>
 
@@ -490,7 +498,7 @@ Return value:
 
  (any)
 
-You can use `format_completion` function in `Complete::Bash` module to format
+You can use C<format_completion> function in C<Complete::Bash> module to format
 the result of this function for bash.
 
 =head1 SEE ALSO

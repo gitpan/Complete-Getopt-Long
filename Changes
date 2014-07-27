@@ -1,5 +1,16 @@
 Revision history for Complete-Getopt-Long
 
+0.10    2014-07-27 (SHARYANTO)
+
+        - Some fixes.
+
+        [INCOMPATIBLE CHANGES]
+
+        - To avoid cascading parent_args within parent_args (and so on), replace
+          it with 'extras'. Now you can chuck all the extra stuffs you want
+          to pass to completion routine here.
+
+
 0.09    2014-07-27 (SHARYANTO)
 
         - Support the deprecated 'completion' argument as hash. Undocumented and

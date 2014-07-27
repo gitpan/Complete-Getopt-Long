@@ -3,7 +3,7 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.09 of Complete::Getopt::Long (from
+    This document describes version 0.10 of Complete::Getopt::Long (from
     Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 SYNOPSIS
@@ -16,11 +16,12 @@ FUNCTIONS
 
     This routine can complete option names, where the option names are
     retrieved from "Getopt::Long" specification. If you provide completion
-    hints in "hints", you can also complete option *values* and *arguments*.
+    routine in "completion", you can also complete *option values* and
+    *arguments*.
 
     Arguments ('*' denotes required arguments):
 
-    *   completion => *hash*
+    *   completion => *code*
 
         Completion routine to complete option value/argument.
 
@@ -41,7 +42,7 @@ FUNCTIONS
         *   "argpos" (int, argument position, zero-based; undef if
             completing option)
 
-        *   "parent_args"
+        *   "extras"
 
         *   "seen_opts" (hash, all the options seen in "words")
 
@@ -58,19 +59,19 @@ FUNCTIONS
          use Complete::Unix qw(complete_user);
          use Complete::Util qw(complete_array_elem);
          complete_cli_arg(
-             getopt_spec =E<gt> {
-                 'help|h'   =E<gt> sub{...},
-                 'format=s' =E<gt> \$format,
-                 'user=s'   =E<gt> \$user,
+             getopt_spec => {
+                 'help|h'   => sub{...},
+                 'format=s' => \$format,
+                 'user=s'   => \$user,
              },
-             completion  =E<gt> sub {
+             completion  => sub {
                  my %args  = @_;
                  my $word  = $args{word};
                  my $ospec = $args{ospec};
                  if ($ospec && $ospec eq 'format=s') {
-                     complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
+                     complete_array(array=>[qw/json text xml yaml/], word=>$word);
                  } else {
-                     complete_user(word=E<gt>$word);
+                     complete_user(word=>$word);
                  }
              },
          );
@@ -81,6 +82,10 @@ FUNCTIONS
 
         See function "parse_cmdline" in "Complete::Bash" on how to produce
         this (if you're using bash).
+
+    *   extras => *hash*
+
+        To pass extra arguments to completion routines.
 
     *   getopt_spec* => *hash*
 
@@ -97,7 +102,7 @@ FUNCTIONS
 
      (any)
 
-    You can use `format_completion` function in `Complete::Bash` module to
+    You can use "format_completion" function in "Complete::Bash" module to
     format the result of this function for bash.
 
 SEE ALSO
