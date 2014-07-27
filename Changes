@@ -1,5 +1,11 @@
 Revision history for Complete-Getopt-Long
 
+0.09    2014-07-27 (SHARYANTO)
+
+        - Support the deprecated 'completion' argument as hash. Undocumented and
+          will be removed in the future though.
+
+
 0.08    2014-07-27 (SHARYANTO)
 
         - [ux] Proper escaping mode when completing environment variables.
@@ -21,8 +27,8 @@ Revision history for Complete-Getopt-Long
         [INCOMPATIBLE CHANGES]
 
         - 'completion' argument is now a single coderef instead of hash of
-          coderefs/arrays. This makes the code (and client code) simpler. But
-          you now must supply a code instead of just an array.
+          coderefs/arrays. I think this is conceptually simpler and does not
+          force the user to specify for every opt spec if she doesn't need to.
 
 
 0.05    2014-07-26 (SHARYANTO)

@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-27'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -179,7 +179,28 @@ sub complete_cli_arg {
     defined(my $cword = $args{cword}) or die "Please specify cword";
     #say "D:words=", join(", ", @$words), ", cword=$cword";
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
-    my $comp = $args{completion} // &_default_completion;
+    my $comp0 = $args{completion};
+    my $comp = $comp0 // &_default_completion;
+
+    # before v0.06, completion is a hash, we'll support this for a while
+    if (ref($comp) eq 'HASH') {
+        $comp = sub {
+            my %cargs = @_;
+            my $type  = $cargs{type};
+            my $ospec = $cargs{ospec} // '';
+            my $word  = $cargs{word};
+            for my $k (keys %$comp0) {
+                my $v = $comp0->{$k};
+                next unless $k eq '' ? $type eq 'arg' : $k eq $ospec;
+                if (ref($v) eq 'ARRAY') {
+                    return Complete::Util::complete_array_elem(
+                        word=>$word, array=>$v);
+                } else {
+                    return $v->(%cargs);
+                }
+            }
+        };
+    }
 
     # parse all options first & supply default completion routine
     my %opts;
@@ -368,7 +389,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.08 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
+This document describes version 0.09 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 =head1 SYNOPSIS
 
