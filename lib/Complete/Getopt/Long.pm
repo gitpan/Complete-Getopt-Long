@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-07-26'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2014-07-27'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
 
 our %SPEC;
 
-sub _default_fallback_completion {
+sub _default_completion {
     my %args = @_;
     my $word = $args{word} // '';
     if ($word =~ /\A\$/) {
@@ -84,42 +84,47 @@ _
         },
         completion => {
             summary     =>
-                'Completion routines for complete option values/arguments',
+                'Completion routine to complete option value/argument',
+            schema      => 'code*',
             description => <<'_',
 
-The keys are option spec, like in `getopt_spec`. To refer to arguments, use ''
-(empty string). The values are either arrayrefs (to specify valid values) or a
-coderefs to supply custom completion. Completion code will receive a hash of
-arguments containing these keys: `word` (word to be completed) and is expected
-to return a completion reply in the form of array. The various `complete_*`
-function like those in `Complete::Util` or the other `Complete::*` modules are
-suitable to use here. Example:
+Completion code will receive a hash of arguments containing these keys:
 
-    require Complete::Unix;
+* `type` (str, what is being completed, either `optname`, `optval`, or `arg`)
+* `word` (str, word to be completed)
+* `opt` (str, option name, e.g. `--str`; undef if we're completing argument)
+* `ospec` (str, Getopt::Long option spec, e.g. `str|S=s`; undef when completing
+  argument)
+* `argpos` (int, argument position, zero-based; undef if completing option)
+* `parent_args`
+* `seen_opts` (hash, all the options seen in `words`)
+
+and is expected to return a completion reply in the form of array. The various
+`complete_*` function like those in `Complete::Util` or the other `Complete::*`
+modules are suitable to use here. Example:
+
+    use Complete::Unix qw(complete_user);
+    use Complete::Util qw(complete_array_elem);
     complete_cli_arg(
         getopt_spec => {
             'help|h'   => sub{...},
-            'format=s' => \$fmt,
+            'format=s' => \$format,
             'user=s'   => \$user,
         },
-        completion  => {
-            'format=s' => ['json', 'text', 'xml', 'yaml'],
-            'user=s'   => \&Complete::Unix::complete_user,
+        completion  => sub {
+            my %args  = @_;
+            my $word  = $args{word};
+            my $ospec = $args{ospec};
+            if ($ospec && $ospec eq 'format=s') {
+                complete_array(array=>[qw/json text xml yaml/], word=>$word);
+            } else {
+                complete_user(word=>$word);
+            }
         },
     );
 
 _
             schema      => 'hash*',
-        },
-        fallback_completion => {
-            description => <<'_',
-
-If completion routine for a certain option or argument is not provided in
-`completion`, this fallback routine is used. The default, if this option is not
-specified, is to complete environment variables (`$FOO`) and files.
-
-_
-            schema => 'code*',
         },
         words => {
             summary     => 'Command line arguments, like @ARGV',
@@ -167,8 +172,7 @@ sub complete_cli_arg {
     defined(my $cword = $args{cword}) or die "Please specify cword";
     #say "D:words=", join(", ", @$words), ", cword=$cword";
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
-    my $comps = $args{completion};
-    my $fbcomp = $args{fallback_completion} // \&_default_fallback_completion;
+    my $comp = $args{completion} // &_default_completion;
 
     # parse all options first & supply default completion routine
     my %opts;
@@ -199,6 +203,7 @@ sub complete_cli_arg {
     my @expects;
 
     my $i = -1;
+    my $argpos = 0;
 
   WORD:
     while (1) {
@@ -212,7 +217,7 @@ sub complete_cli_arg {
             while (1) {
                 $i++;
                 last WORD if $i >= @$words;
-                $expects[$i] = {arg=>1};
+                $expects[$i] = {arg=>1, argpos=>$argpos++};
             }
         }
 
@@ -266,6 +271,7 @@ sub complete_cli_arg {
             }
         } else {
             $expects[$i]{arg} = 1;
+            $expects[$i]{argpos} = $argpos++;
         }
     }
 
@@ -304,34 +310,28 @@ sub complete_cli_arg {
     if (exists($exp->{optval})) {
         my $opt = $exp->{optval};
         my $opthash = $opts{$opt} if $opt;
-        my $comp = $comps->{$opthash->{ospec}} if $opthash;
-        $comp //= $fbcomp;
-        if (ref($comp) eq 'ARRAY') {
-            push @res, @{ Complete::Util::complete_array_elem(
-                array => \@$comp, word => $word) };
-        } elsif (ref($comp) eq 'CODE') {
-            my $compres = $comp->(word=>$word);
-            if (ref($compres) eq 'ARRAY') {
-                push @res, @$compres;
-            } elsif (ref($compres) eq 'HASH') {
-                return $compres unless @res;
-                push @res, @{ $compres->{completion} // [] };
-            }
+        my $compres = $comp->(
+            type=>'optval', word=>$word, opt=>$opt,
+            ospec=>$opthash->{ospec}, argpos=>undef,
+            parent_args=>\%args, seen_opts=>\%seen_opts);
+        if (ref($compres) eq 'ARRAY') {
+            push @res, @$compres;
+        } elsif (ref($compres) eq 'HASH') {
+            return $compres unless @res;
+            push @res, @{ $compres->{completion} // [] };
         }
     }
 
-    if (exists($exp->{arg}) && $comps) {
-        my $comp = $comps->{''} // $fbcomp;
-        if (ref($comp) eq 'ARRAY') {
-            push @res, @$comp;
-        } elsif (ref($comp) eq 'CODE') {
-            my $compres = $comp->(word=>$word);
-            if (ref($compres) eq 'ARRAY') {
-                push @res, @$compres;
-            } elsif (ref($compres) eq 'HASH') {
-                return $compres unless @res;
-                push @res, @{ $compres->{completion} // [] };
-            }
+    if (exists($exp->{arg})) {
+        my $compres = $comp->(
+            type=>'arg', word=>$word, opt=>undef,
+            ospec=>undef, argpos=>$exp->{argpos},
+            parent_args=>\%args, seen_opts=>\%seen_opts);
+        if (ref($compres) eq 'ARRAY') {
+            push @res, @$compres;
+        } elsif (ref($compres) eq 'HASH') {
+            return $compres unless @res;
+            push @res, @{ $compres->{completion} // [] };
         }
     }
 
@@ -353,7 +353,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.05 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-26.
+This document describes version 0.06 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 =head1 SYNOPSIS
 
@@ -378,26 +378,50 @@ Arguments ('*' denotes required arguments):
 
 =item * B<completion> => I<hash>
 
-Completion routines for complete option values/arguments.
+Completion routine to complete option value/argument.
 
-The keys are option spec, like in C<getopt_spec>. To refer to arguments, use ''
-(empty string). The values are either arrayrefs (to specify valid values) or a
-coderefs to supply custom completion. Completion code will receive a hash of
-arguments containing these keys: C<word> (word to be completed) and is expected
-to return a completion reply in the form of array. The various C<complete_*>
-function like those in C<Complete::Util> or the other C<Complete::*> modules are
-suitable to use here. Example:
+Completion code will receive a hash of arguments containing these keys:
 
- require Complete::Unix;
+=over
+
+=item * C<type> (str, what is being completed, either C<optname>, C<optval>, or C<arg>)
+
+=item * C<word> (str, word to be completed)
+
+=item * C<opt> (str, option name, e.g. C<--str>; undef if we're completing argument)
+
+=item * C<ospec> (str, Getopt::Long option spec, e.g. C<str|S=s>; undef when completing
+argument)
+
+=item * C<argpos> (int, argument position, zero-based; undef if completing option)
+
+=item * C<parent_args>
+
+=item * C<seen_opts> (hash, all the options seen in C<words>)
+
+=back
+
+and is expected to return a completion reply in the form of array. The various
+C<complete_*> function like those in C<Complete::Util> or the other C<Complete::*>
+modules are suitable to use here. Example:
+
+ use Complete::Unix qw(complete_user);
+ use Complete::Util qw(complete_array_elem);
  complete_cli_arg(
      getopt_spec =E<gt> {
          'help|h'   =E<gt> sub{...},
-         'format=s' =E<gt> \$fmt,
+         'format=s' =E<gt> \$format,
          'user=s'   =E<gt> \$user,
      },
-     completion  =E<gt> {
-         'format=s' =E<gt> ['json', 'text', 'xml', 'yaml'],
-         'user=s'   =E<gt> \&Complete::Unix::complete_user,
+     completion  =E<gt> sub {
+         my %args  = @_;
+         my $word  = $args{word};
+         my $ospec = $args{ospec};
+         if ($ospec && $ospec eq 'format=s') {
+             complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
+         } else {
+             complete_user(word=E<gt>$word);
+         }
      },
  );
 
@@ -407,12 +431,6 @@ Index in words of the word we're trying to complete.
 
 See function C<parse_cmdline> in C<Complete::Bash> on how to produce this (if
 you're using bash).
-
-=item * B<fallback_completion> => I<code>
-
-If completion routine for a certain option or argument is not provided in
-C<completion>, this fallback routine is used. The default, if this option is not
-specified, is to complete environment variables (C<$FOO>) and files.
 
 =item * B<getopt_spec>* => I<hash>
 

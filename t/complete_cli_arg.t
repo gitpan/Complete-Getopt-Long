@@ -93,25 +93,25 @@ subtest basics => sub {
         comp_line0  => 'CMD --foo --bar 2 --^',
         result      => [qw/--foo/],
     );
-    # even though there's arg completion, /^-/ indicates that user wants to
+    # even though there's completion routine, /^-/ indicates that user wants to
     # complete option name
     test_complete(
-        name        => 'option name with arg completion',
+        name        => 'option name with completion routine',
         args        => {getopt_spec=>\%gospec,
-                        completion=>{''=>sub { [qw/-x/] }}},
+                        completion=>sub { [qw/-x/] }},
         comp_line0  => 'CMD -^',
         result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
                            --nobool --str -F -S -f/],
     );
 
     test_complete(
-        name        => 'option value without completion',
+        name        => 'option value without completion routine',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD --str ^',
         result      => [qw//],
     );
     test_complete(
-        name        => 'option value without completion (2)',
+        name        => 'option value without completion routine (2)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD --str=^',
         result      => [qw//],
@@ -129,40 +129,19 @@ subtest basics => sub {
         result      => [qw//],
     );
     test_complete(
-        name        => 'option value with array completion',
+        name        => 'option value with completion routine returning array',
         args        => {getopt_spec=>\%gospec,
-                        completion=>{'str|S=s'=>[qw/aa a b c/]}},
-        comp_line0  => 'CMD --str ^',
-        result      => [qw/a aa b c/],
-    );
-    test_complete(
-        name        => 'option value with array completion (2)',
-        args        => {getopt_spec=>\%gospec,
-                        completion=>{'str|S=s'=>[qw/aa a b c/]}},
-        comp_line0  => 'CMD --str a^',
-        result      => [qw/a aa/],
-    );
-    test_complete(
-        name        => 'option value with array completion using =',
-        args        => {getopt_spec=>\%gospec,
-                        completion=>{'str|S=s'=>[qw/aa a b c/]}},
-        comp_line0  => 'CMD --str=a^',
-        result      => [qw/a aa/],
-    );
-    test_complete(
-        name        => 'option value with code completion returning array',
-        args        => {getopt_spec=>\%gospec,
-                        completion=>{'str|S=s'=>sub { [qw/aa a b c/] }}},
+                        completion=>sub { [qw/aa a b c/] }},
         comp_line0  => 'CMD --str ^',
         result      => [qw/a aa b c/],
     );
 
-    # XXX test option value with code completion returning hash
+    # XXX test option value with completion routine returning hash
 
     test_complete(
-        name        => 'arg',
+        name        => 'arg with completion routine returning array',
         args        => {getopt_spec=>\%gospec,
-                        completion=>{''=>sub { [qw/aa a b c/] }}},
+                        completion=>sub { [qw/aa a b c/] }},
         comp_line0  => 'CMD ^',
         result      => [qw/a aa b c/],
     );
@@ -199,8 +178,7 @@ sub test_complete {
         require Complete::Getopt::Long;
         my $res = Complete::Getopt::Long::complete_cli_arg(
             words=>$words, cword=>$cword,
-            # we don't want to test default fallback completion yet
-            fallback_completion=>sub{[]},
+            completion=>sub{[]},
             %{$args{args}},
         );
         #use DD; dd { words=>$words, cword=>$cword, %{$args{args}} };
