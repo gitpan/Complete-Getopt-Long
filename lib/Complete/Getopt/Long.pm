@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-07-27'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
@@ -101,7 +101,12 @@ Completion code will receive a hash of arguments containing these keys:
 
 and is expected to return a completion reply in the form of array. The various
 `complete_*` function like those in `Complete::Util` or the other `Complete::*`
-modules are suitable to use here. Example:
+modules are suitable to use here.
+
+Code can also return undef, in which the default completion routine is called.
+It completes from environment variables (`$foo`), usernames (`~foo`), and files.
+
+Example:
 
     use Complete::Unix qw(complete_user);
     use Complete::Util qw(complete_array_elem);
@@ -310,10 +315,14 @@ sub complete_cli_arg {
     if (exists($exp->{optval})) {
         my $opt = $exp->{optval};
         my $opthash = $opts{$opt} if $opt;
-        my $compres = $comp->(
-            type=>'optval', word=>$word, opt=>$opt,
-            ospec=>$opthash->{ospec}, argpos=>undef,
-            parent_args=>\%args, seen_opts=>\%seen_opts);
+        my %compargs = (
+            type=>'optval', word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
+            argpos=>undef, parent_args=>\%args, seen_opts=>\%seen_opts,
+        );
+        my $compres = $comp->(%compargs);
+        if (!defined $compres) {
+            $compres = _default_completion(%compargs);
+        }
         if (ref($compres) eq 'ARRAY') {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
@@ -323,10 +332,14 @@ sub complete_cli_arg {
     }
 
     if (exists($exp->{arg})) {
-        my $compres = $comp->(
-            type=>'arg', word=>$word, opt=>undef,
-            ospec=>undef, argpos=>$exp->{argpos},
-            parent_args=>\%args, seen_opts=>\%seen_opts);
+        my %compargs = (
+            type=>'arg', word=>$word, opt=>undef, ospec=>undef,
+            argpos=>$exp->{argpos}, parent_args=>\%args, seen_opts=>\%seen_opts,
+        );
+        my $compres = $comp->(%compargs);
+        if (!defined $compres) {
+            $compres = _default_completion(%compargs);
+        }
         if (ref($compres) eq 'ARRAY') {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
@@ -353,7 +366,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.06 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
+This document describes version 0.07 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 =head1 SYNOPSIS
 
@@ -403,7 +416,12 @@ argument)
 
 and is expected to return a completion reply in the form of array. The various
 C<complete_*> function like those in C<Complete::Util> or the other C<Complete::*>
-modules are suitable to use here. Example:
+modules are suitable to use here.
+
+Code can also return undef, in which the default completion routine is called.
+It completes from environment variables (C<$foo>), usernames (C<~foo>), and files.
+
+Example:
 
  use Complete::Unix qw(complete_user);
  use Complete::Util qw(complete_array_elem);

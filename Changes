@@ -1,5 +1,12 @@
 Revision history for Complete-Getopt-Long
 
+0.07    2014-07-27 (SHARYANTO)
+
+        - [ux] Completion routine can now return undef so that
+          complete_cli_arg() calls default/fallback completion routine that
+          complets from environment vars ('$foo'), usernames ('~foo'), or files.
+
+
 0.06    2014-07-27 (SHARYANTO)
 
         - Completion routine now gets extra information/arguments. In addition

@@ -3,7 +3,7 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.06 of Complete::Getopt::Long (from
+    This document describes version 0.07 of Complete::Getopt::Long (from
     Perl distribution Complete-Getopt-Long), released on 2014-07-27.
 
 SYNOPSIS
@@ -47,7 +47,13 @@ FUNCTIONS
 
         and is expected to return a completion reply in the form of array.
         The various "complete_*" function like those in "Complete::Util" or
-        the other "Complete::*" modules are suitable to use here. Example:
+        the other "Complete::*" modules are suitable to use here.
+
+        Code can also return undef, in which the default completion routine
+        is called. It completes from environment variables ($foo), usernames
+        ("~foo"), and files.
+
+        Example:
 
          use Complete::Unix qw(complete_user);
          use Complete::Util qw(complete_array_elem);
