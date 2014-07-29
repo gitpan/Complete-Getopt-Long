@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-07-28'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2014-07-29'; # DATE
+our $VERSION = '0.12'; # VERSION
 
 use 5.010001;
 use strict;
@@ -403,6 +403,8 @@ sub complete_cli_arg {
         #use DD; dd \@o;
         push @res, @{ Complete::Util::complete_array_elem(
             array => \@o, word => $word) };
+        return {completion=>\@res, escmode=>'option'}
+            if !exists($exp->{optval}) && !exists($exp->{arg});
     }
 
     # complete option value
@@ -464,7 +466,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.11 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-28.
+This document describes version 0.12 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-29.
 
 =head1 SYNOPSIS
 

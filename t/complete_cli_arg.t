@@ -20,26 +20,33 @@ subtest basics => sub {
         name        => 'option name',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD ^',
-        result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
-                           --nobool --str -1 -F -S -f/],
+        result      => [qw/--bool --flag1 --flag2 --float --int
+                           --no-bool --nobool --str -1 -F -S -f/],
     );
     test_complete(
         name        => 'option name (2)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD --f^',
-        result      => [qw/--flag1 --flag2 --float/],
+        result      => {completion=>
+                            [qw/--flag1 --flag2 --float/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name (3)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD --str^',
-        result      => [qw/--str/],
+        result      => {completion=>
+                            [qw/--str/],
+                        escmode=>'option'},
+
     );
     test_complete(
         name        => 'option name (bundling)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD -f^',
-        result      => [qw/-f1 -fF -fS/],
+        result      => {completion=>
+                            [qw/-f1 -fF -fS/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name (bundling, stops after value expected)',
@@ -51,53 +58,69 @@ subtest basics => sub {
         name        => 'option name (bundling 2)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD -f -1^',
-        result      => [qw/-1F -1S/],
+        result      => {completion=>
+                            [qw/-1F -1S/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (alias)',
         args        => {getopt_spec=>\%gospec, },
-        comp_line0  => 'CMD --flag1 ^', # means -1 is also mentioned
-        result      => [qw/--bool --flag2 --float --int --no-bool
-                           --nobool --str -F -S -f/],
+        comp_line0  => 'CMD --flag1 -^', # means -1 is also mentioned
+        result      => {completion=>
+                            [qw/--bool --flag2 --float --int --no-bool
+                                --nobool --str -F -S -f/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (alias 2)',
         args        => {getopt_spec=>\%gospec, },
-        comp_line0  => 'CMD ^  --flag1', # ditto
-        result      => [qw/--bool --flag2 --float --int --no-bool
-                           --nobool --str -F -S -f/],
+        comp_line0  => 'CMD -^  --flag1', # ditto
+        result      => {completion=>
+                            [qw/--bool --flag2 --float --int --no-bool
+                                --nobool --str -F -S -f/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (bundling)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD -f1 -^',
-        result      => [qw/--bool --float --int --no-bool
-                           --nobool --str -F -S/],
+        result      => {completion=>
+                            [qw/--bool --float --int --no-bool
+                                --nobool --str -F -S/],
+                        escmode=>'option'},
     );
     my @foo;
     test_complete(
         name        => 'repeatable option name 1 (assigned to arrayref)',
         args        => {getopt_spec=>{'foo=s'=>\@foo, 'bar=s'=>sub{}}, },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
-        result      => [qw/--foo/],
+        result      => {completion=>
+                            [qw/--foo/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'repeatable option name 2 (desttype @)',
         args        => {getopt_spec=>{'foo=s@'=>sub{}, 'bar=s'=>sub{}}, },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
-        result      => [qw/--foo/],
+        result      => {completion=>
+                            [qw/--foo/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'repeatable option name 3 (desttype %)',
         args        => {getopt_spec=>{'foo=s%'=>sub{}, 'bar=s'=>sub{}}, },
         comp_line0  => 'CMD --foo 1 --bar 2 --^',
-        result      => [qw/--foo/],
+        result      => {completion=>
+                            [qw/--foo/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'repeatable option name 4 (incremental)',
         args        => {getopt_spec=>{'foo+'=>sub{}, 'bar=s'=>sub{}}, },
         comp_line0  => 'CMD --foo --bar 2 --^',
-        result      => [qw/--foo/],
+        result      => {completion=>
+                            [qw/--foo/],
+                        escmode=>'option'},
     );
     test_complete(
         name        => 'option name + arg completion',
@@ -113,8 +136,10 @@ subtest basics => sub {
         args        => {getopt_spec=>\%gospec,
                         completion=>sub { [qw/-x/] }},
         comp_line0  => 'CMD -^',
-        result      => [qw/--bool --flag1 --flag2 --float --int --no-bool
-                           --nobool --str -1 -F -S -f/],
+        result      => {completion=>
+                            [qw/--bool --flag1 --flag2 --float --int --no-bool
+                                --nobool --str -1 -F -S -f/],
+                        escmode=>'option'},
     );
 
     test_complete(
@@ -173,6 +198,9 @@ subtest basics => sub {
 
     # XXX test optional value
 };
+
+# XXX test default fallback completion: file
+# XXX test default fallback completion: env
 
 DONE_TESTING:
 done_testing;
