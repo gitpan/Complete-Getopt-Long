@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-07-29'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2014-08-06'; # DATE
+our $VERSION = '0.13'; # VERSION
 
 use 5.010001;
 use strict;
@@ -413,7 +413,8 @@ sub complete_cli_arg {
         my $opt = $exp->{optval};
         my $opthash = $opts{$opt} if $opt;
         my %compargs = (
-            type=>'optval', word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
+            type=>'optval', words=>$args{words}, cword=>$args{cword},
+            word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
             argpos=>undef, extras=>$extras, nth=>$exp->{nth},
             seen_opts=>\%seen_opts,
         );
@@ -433,7 +434,8 @@ sub complete_cli_arg {
     {
         last unless exists($exp->{arg});
         my %compargs = (
-            type=>'arg', word=>$word, opt=>undef, ospec=>undef,
+            type=>'arg', words=>$args{words}, cword=>$args{cword},
+            word=>$word, opt=>undef, ospec=>undef,
             argpos=>$exp->{argpos}, extras=>$extras, seen_opts=>\%seen_opts,
         );
         my $compres = $comp->(%compargs);
@@ -466,7 +468,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.12 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-07-29.
+This document describes version 0.13 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-08-06.
 
 =head1 SYNOPSIS
 
@@ -526,19 +528,19 @@ Example:
  use Complete::Unix qw(complete_user);
  use Complete::Util qw(complete_array_elem);
  complete_cli_arg(
-     getopt_spec => {
-         'help|h'   => sub{...},
-         'format=s' => \$format,
-         'user=s'   => \$user,
+     getopt_spec =E<gt> {
+         'help|h'   =E<gt> sub{...},
+         'format=s' =E<gt> \$format,
+         'user=s'   =E<gt> \$user,
      },
-     completion  => sub {
+     completion  =E<gt> sub {
          my %args  = @_;
          my $word  = $args{word};
          my $ospec = $args{ospec};
          if ($ospec && $ospec eq 'format=s') {
-             complete_array(array=>[qw/json text xml yaml/], word=>$word);
+             complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
          } else {
-             complete_user(word=>$word);
+             complete_user(word=E<gt>$word);
          }
      },
  );
@@ -571,7 +573,7 @@ Return value:
 
  (any)
 
-You can use C<format_completion> function in C<Complete::Bash> module to format
+You can use `format_completion` function in `Complete::Bash` module to format
 the result of this function for bash.
 
 =head1 SEE ALSO
