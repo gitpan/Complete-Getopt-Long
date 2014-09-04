@@ -1,5 +1,13 @@
 Revision history for Complete-Getopt-Long
 
+0.14    2014-09-04 (PERLANCAR)
+
+        - No functional changes.
+
+        - Make dependency to 'Complete::Getopt::Long' optional to shorten the
+          prerequisite list.
+
+
 0.13    2014-08-06 (SHARYANTO)
 
         - Provide 'words' and 'cword' to completion routine.

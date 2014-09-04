@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Complete command-line argument using Getopt::Long specification",
-  "AUTHOR" => "Steven Haryanto <stevenharyanto\@gmail.com>",
+  "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
   },
@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Complete::Getopt::Long",
   "PREREQ_PM" => {
-    "Complete::Unix" => 0,
     "Complete::Util" => 0,
     "Getopt::Long::Util" => "0.77",
     "List::MoreUtils" => 0,
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +42,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Bash" => "0.09",
-  "Complete::Unix" => 0,
   "Complete::Util" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Util" => "0.77",

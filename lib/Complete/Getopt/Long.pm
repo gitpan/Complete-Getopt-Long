@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-08-06'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2014-09-04'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,8 @@ sub _default_completion {
                 escmode=>'shellvar'};
     }
     if ($word =~ /\A~/) {
-        require Complete::Unix;
+        eval { require Complete::Unix };
+        return [] if $@;
         $word =~ s/\A~//;
         return [
             map {"~$_"}
@@ -468,7 +469,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.13 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-08-06.
+This document describes version 0.14 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-09-04.
 
 =head1 SYNOPSIS
 
@@ -596,7 +597,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 
@@ -608,11 +609,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
