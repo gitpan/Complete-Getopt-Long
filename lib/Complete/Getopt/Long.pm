@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-09-04'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $DATE = '2014-11-10'; # DATE
+our $VERSION = '0.15'; # VERSION
 
 use 5.010001;
 use strict;
@@ -215,7 +215,8 @@ sub complete_cli_arg {
         $res->{min_vals} //= $res->{type} ? 1 : 0;
         $res->{max_vals} //= $res->{type} || $res->{opttype} ? 1:0;
         for my $o0 (@{ $res->{opts} }) {
-            my @o = $res->{is_neg} ? ($o0, "no$o0", "no-$o0") : ($o0);
+            my @o = $res->{is_neg} && length($o0) > 1 ?
+                ($o0, "no$o0", "no-$o0") : ($o0);
             for my $o (@o) {
                 my $k = length($o) > 1 ? "--$o" : "-$o";
                 $opts{$k} = {
@@ -469,7 +470,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.14 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-09-04.
+This document describes version 0.15 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-11-10.
 
 =head1 SYNOPSIS
 
@@ -529,19 +530,19 @@ Example:
  use Complete::Unix qw(complete_user);
  use Complete::Util qw(complete_array_elem);
  complete_cli_arg(
-     getopt_spec =E<gt> {
-         'help|h'   =E<gt> sub{...},
-         'format=s' =E<gt> \$format,
-         'user=s'   =E<gt> \$user,
+     getopt_spec => {
+         'help|h'   => sub{...},
+         'format=s' => \$format,
+         'user=s'   => \$user,
      },
-     completion  =E<gt> sub {
+     completion  => sub {
          my %args  = @_;
          my $word  = $args{word};
          my $ospec = $args{ospec};
          if ($ospec && $ospec eq 'format=s') {
-             complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
+             complete_array(array=>[qw/json text xml yaml/], word=>$word);
          } else {
-             complete_user(word=E<gt>$word);
+             complete_user(word=>$word);
          }
      },
  );
@@ -597,7 +598,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 

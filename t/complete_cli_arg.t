@@ -41,6 +41,12 @@ subtest basics => sub {
 
     );
     test_complete(
+        name        => 'option name (single letter n! does not get --nox and --no-x)',
+        args        => {getopt_spec=>{'n!'=>sub{}}, },
+        comp_line0  => 'CMD ^',
+        result      => [qw/-n/],
+    );
+    test_complete(
         name        => 'option name (bundling)',
         args        => {getopt_spec=>\%gospec, },
         comp_line0  => 'CMD -f^',

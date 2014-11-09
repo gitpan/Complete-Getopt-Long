@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.14 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2014-09-04.
+    This document describes version 0.15 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-11-10.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -59,19 +59,19 @@ FUNCTIONS
          use Complete::Unix qw(complete_user);
          use Complete::Util qw(complete_array_elem);
          complete_cli_arg(
-             getopt_spec =E<gt> {
-                 'help|h'   =E<gt> sub{...},
-                 'format=s' =E<gt> \$format,
-                 'user=s'   =E<gt> \$user,
+             getopt_spec => {
+                 'help|h'   => sub{...},
+                 'format=s' => \$format,
+                 'user=s'   => \$user,
              },
-             completion  =E<gt> sub {
+             completion  => sub {
                  my %args  = @_;
                  my $word  = $args{word};
                  my $ospec = $args{ospec};
                  if ($ospec && $ospec eq 'format=s') {
-                     complete_array(array=E<gt>[qw/json text xml yaml/], word=E<gt>$word);
+                     complete_array(array=>[qw/json text xml yaml/], word=>$word);
                  } else {
-                     complete_user(word=E<gt>$word);
+                     complete_user(word=>$word);
                  }
              },
          );
@@ -124,7 +124,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Complete-Getopt-Long>.
+    <https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

@@ -1,5 +1,10 @@
 Revision history for Complete-Getopt-Long
 
+0.15    2014-11-10 (PERLANCAR)
+
+        - Don't produce --nox and --no-x for single letter spec 'x!'.
+
+
 0.14    2014-09-04 (PERLANCAR)
 
         - No functional changes.
