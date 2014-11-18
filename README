@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.15 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2014-11-10.
+    This document describes version 0.16 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-11-18.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -18,6 +18,14 @@ FUNCTIONS
     retrieved from "Getopt::Long" specification. If you provide completion
     routine in "completion", you can also complete *option values* and
     *arguments*.
+
+    Note that this routine does not use "Getopt::Long" (it does its own
+    parsing) and currently is not affected by Getopt::Long's configuration.
+    Its behavior mimics Getopt::Long under these configuration: "bundling",
+    "no_ignore_case". Which I think is the sensible default. This routine
+    also does not currently support "auto_help" and "auto_version", so
+    you'll need to add those options specifically if you want to recognize
+    "--help/-?" and "--version", respectively.
 
     Arguments ('*' denotes required arguments):
 
@@ -124,7 +132,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+    <https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
