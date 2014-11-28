@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-11-18'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2014-11-28'; # DATE
+our $VERSION = '0.17'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,7 +26,7 @@ sub _default_completion {
             my $compres = Complete::Util::complete_env(
                 word=>$word, ci=>$args{ci});
             last unless @$compres;
-            return {completion=>$compres, escmode=>'shellvar'};
+            return {words=>$compres, escmode=>'shellvar'};
         }
         # if empty, fallback to searching file
     }
@@ -44,7 +44,7 @@ sub _default_completion {
                 word=>$word, ci=>$args{ci},
             );
             last unless @$compres;
-            return {completion=>$compres, path_sep=>'/'};
+            return {words=>$compres, path_sep=>'/'};
         }
         # if empty, fallback to searching file
     }
@@ -64,7 +64,7 @@ sub _default_completion {
                 $_ .= "/" if (-d $_);
                 s/\A\Q$dir->[0]\E/$tilde/;
             }
-            return {completion=>$compres, path_sep=>'/'};
+            return {words=>$compres, path_sep=>'/'};
         }
         # if empty, fallback to searching file
     }
@@ -80,11 +80,11 @@ sub _default_completion {
             for (@$compres) {
                 $_ .= "/" if (-d $_);
             }
-            return {completion=>$compres, path_sep=>'/'};
+            return {words=>$compres, path_sep=>'/'};
         }
         # if empty, fallback to searching file
     }
-    return {completion=>Complete::Util::complete_file(word=>$word),
+    return {words=>Complete::Util::complete_file(word=>$word),
             path_sep=>'/'};
 }
 
@@ -461,7 +461,7 @@ sub complete_cli_arg {
         #use DD; dd \@o;
         push @res, @{ Complete::Util::complete_array_elem(
             array => \@o, word => $word) };
-        return {completion=>\@res, escmode=>'option'}
+        return {words=>\@res, escmode=>'option'}
             if !exists($exp->{optval}) && !exists($exp->{arg});
     }
 
@@ -484,7 +484,7 @@ sub complete_cli_arg {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
             return $compres unless @res;
-            push @res, @{ $compres->{completion} // [] };
+            push @res, @{ $compres->{words} // [] };
         }
     }
 
@@ -504,7 +504,7 @@ sub complete_cli_arg {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
             return $compres unless @res;
-            push @res, @{ $compres->{completion} // [] };
+            push @res, @{ $compres->{words} // [] };
         }
     }
 
@@ -526,7 +526,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.16 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-11-18.
+This document describes version 0.17 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-11-28.
 
 =head1 SYNOPSIS
 
@@ -661,7 +661,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 

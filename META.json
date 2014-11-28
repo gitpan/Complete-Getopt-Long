@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "test" : {
          "requires" : {
-            "Complete::Bash" : "0.09",
+            "Complete::Bash" : "0.12",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -58,11 +58,11 @@
       "homepage" : "https://metacpan.org/release/Complete-Getopt-Long",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/perlancar/perl-Complete-Getopt-Long.git",
-         "web" : "https://github.com/perlancar/perl-Complete-Getopt-Long"
+         "url" : "git://github.com/sharyanto/perl-Complete-Getopt-Long.git",
+         "web" : "https://github.com/sharyanto/perl-Complete-Getopt-Long"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018002"
@@ -243,9 +243,9 @@
                         "version" : "4.006"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::Perinci",
-                        "name" : "@Author::PERLANCAR/Perinci",
-                        "version" : "0.15"
+                        "class" : "Pod::Weaver::Plugin::Rinci",
+                        "name" : "@Author::PERLANCAR/Rinci",
+                        "version" : "0.18"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
@@ -258,14 +258,14 @@
                         "version" : "4.006"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::BashCompletion::GetoptLongComplete",
-                        "name" : "@Author::PERLANCAR/BashCompletion::GetoptLongComplete",
-                        "version" : "0.01"
+                        "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
+                        "name" : "@Author::PERLANCAR/Completion::GetoptLongComplete",
+                        "version" : "0.03"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::BashCompletion::PerinciCmdLine",
-                        "name" : "@Author::PERLANCAR/BashCompletion::PerinciCmdLine",
-                        "version" : "0.03"
+                        "class" : "Pod::Weaver::Section::Completion::PerinciCmdLine",
+                        "name" : "@Author::PERLANCAR/Completion::PerinciCmdLine",
+                        "version" : "0.05"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Homepage::DefaultCPAN",
@@ -347,7 +347,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
-            "version" : "2.040"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

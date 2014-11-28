@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.16 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2014-11-18.
+    This document describes version 0.17 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-11-28.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -132,7 +132,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Complete-Getopt-Long>.
+    <https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

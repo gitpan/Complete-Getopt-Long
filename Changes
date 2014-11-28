@@ -1,5 +1,11 @@
 Revision history for Complete-Getopt-Long
 
+0.17    2014-11-28 (PERLANCAR)
+
+	- Adjust to Complete::Bash 0.12 (words are now put in 'words' key
+	  instead of 'completion' key).
+
+
 0.16    2014-11-18 (PERLANCAR)
 
         - Make file completion work more like bash: ~foo/blah<tab> works,

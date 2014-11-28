@@ -27,13 +27,13 @@ my %WriteMakefileArgs = (
     "String::Wildcard::Bash" => 0
   },
   "TEST_REQUIRES" => {
-    "Complete::Bash" => "0.09",
+    "Complete::Bash" => "0.12",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Bash" => "0.09",
+  "Complete::Bash" => "0.12",
   "Complete::Util" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Util" => "0.77",
