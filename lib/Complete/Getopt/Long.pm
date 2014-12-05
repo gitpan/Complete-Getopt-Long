@@ -1,11 +1,12 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-11-28'; # DATE
-our $VERSION = '0.17'; # VERSION
+our $DATE = '2014-12-05'; # DATE
+our $VERSION = '0.18'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::Any '$log';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -19,12 +20,15 @@ sub _default_completion {
     my %args = @_;
     my $word = $args{word} // '';
 
+    $log->tracef('entering default completion');
+
     # try completing '$...' with shell variables
     if ($word =~ /\A\$/) {
+        $log->tracef('completing shell variable');
         require Complete::Util;
         {
             my $compres = Complete::Util::complete_env(
-                word=>$word, ci=>$args{ci});
+                word=>$word, ci=>1);
             last unless @$compres;
             return {words=>$compres, escmode=>'shellvar'};
         }
@@ -33,6 +37,7 @@ sub _default_completion {
 
     # try completing '~foo' with user dir (appending / if user's home exists)
     if ($word =~ m!\A~([^/]*)\z!) {
+        $log->tracef("completing userdir");
         {
             eval { require Unix::Passwd::File };
             last if $@;
@@ -41,7 +46,7 @@ sub _default_completion {
             my $compres = Complete::Util::complete_array(
                 array=>[map {"~" . $_->{user} . ((-d $_->{home}) ? "/":"")}
                             @{ $res->[2] }],
-                word=>$word, ci=>$args{ci},
+                word=>$word, ci=>1,
             );
             last unless @$compres;
             return {words=>$compres, path_sep=>'/'};
@@ -49,24 +54,13 @@ sub _default_completion {
         # if empty, fallback to searching file
     }
 
-    # try completion '~foo/blah' as if completing file, but do not expand ~foo
+    # try completion '~/blah' or '~foo/blah' as if completing file, but do not
+    # expand ~foo (this is supported by complete_file(), so we just give it off
+    # to the routine)
     if ($word =~ m!\A(~[^/]*)/!) {
-        {
-            my $tilde = $1;
-            my $dir = [glob($tilde)]; # glob will expand ~foo to /home/foo
-            last unless @$dir;
-            # XXX unlike in bash, ~foo/<tab> will not match dotfiles if we use
-            # '*'
-            my $compres = [glob("$word*")];
-            last unless @$compres;
-            # unexpand ~foo
-            for (@$compres) {
-                $_ .= "/" if (-d $_);
-                s/\A\Q$dir->[0]\E/$tilde/;
-            }
-            return {words=>$compres, path_sep=>'/'};
-        }
-        # if empty, fallback to searching file
+        $log->tracef("completing file");
+        return {words=>Complete::Util::complete_file(word=>$word, ci=>1),
+                path_sep=>'/'};
     }
 
     # try completing something that contains wildcard with glob. for
@@ -74,6 +68,7 @@ sub _default_completion {
     # treated like [AB]*.
     require String::Wildcard::Bash;
     if (String::Wildcard::Bash::contains_wildcard($word)) {
+        $log->tracef("completing with wildcard glob");
         {
             my $compres = [glob("$word*")];
             last unless @$compres;
@@ -84,7 +79,8 @@ sub _default_completion {
         }
         # if empty, fallback to searching file
     }
-    return {words=>Complete::Util::complete_file(word=>$word),
+    $log->tracef("completing with file");
+    return {words=>Complete::Util::complete_file(word=>$word, ci=>1),
             path_sep=>'/'};
 }
 
@@ -526,7 +522,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.17 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-11-28.
+This document describes version 0.18 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-05.
 
 =head1 SYNOPSIS
 
@@ -638,7 +634,7 @@ Return value:
 
  (any)
 
-You can use `format_completion` function in `Complete::Bash` module to format
+You can use C<format_completion> function in C<Complete::Bash> module to format
 the result of this function for bash.
 
 =head1 SEE ALSO
@@ -661,7 +657,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 

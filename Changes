@@ -1,5 +1,13 @@
 Revision history for Complete-Getopt-Long
 
+0.18    2014-12-05 (PERLANCAR)
+
+        - Delegate '~user/' completion handling to Complete::Util 0.14's
+          complete_file().
+
+        - Do case-insensitive complete_file(), for convenience.
+
+
 0.17    2014-11-28 (PERLANCAR)
 
 	- Adjust to Complete::Bash 0.12 (words are now put in 'words' key
