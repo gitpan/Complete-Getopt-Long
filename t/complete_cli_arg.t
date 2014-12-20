@@ -180,21 +180,16 @@ subtest basics => sub {
         result      => [qw/a aa b c/],
     );
 
-    # accepting hash is deprecated & undocumented but i think i'll support this
-    # for a while
     test_complete(
-        name        => 'option value with hash completion routine',
+        name        => 'extras argument',
         args        => {getopt_spec=>\%gospec,
-                        completion=>{ 'str|S=s' => [qw/aa a b c/] }},
+                        extras=>{foo=>10, bar=>20},
+                        completion=>sub {
+                            my %args = @_;
+                            [$args{bar}, $args{foo}];
+                        }},
         comp_line0  => 'CMD --str ^',
-        result      => [qw/a aa b c/],
-    );
-    test_complete(
-        name        => 'arg with hash completion routine',
-        args        => {getopt_spec=>\%gospec,
-                        completion=>{ '' => sub{[qw/aa a/]} }},
-        comp_line0  => 'CMD --str 1 a^',
-        result      => [qw/a aa/],
+        result      => [qw/10 20/],
     );
 
     # XXX test option value with completion routine returning hash

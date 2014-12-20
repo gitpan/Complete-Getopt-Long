@@ -1,5 +1,21 @@
 Revision history for Complete-Getopt-Long
 
+0.19    2014-12-20 (PERLANCAR)
+
+        [REMOVED FEATURES]
+
+        - Before 0.06, 'completion' argument can also be a hashref. This is no
+          longer supported. 'completion' must be a coderef. We have deprecated
+          this, removed this from the doc, and supported this for a while but
+          it's now time to remove the feature, to simplify stuffs.
+
+        [INCOMPATIBLE CHANGES]
+
+        - In order to simplify writing completion routines, the keys from
+          'extras' are now merged into the final %args for the completion
+          routine. Before it was put into a single key 'extras' in the %args.
+
+
 0.18    2014-12-05 (PERLANCAR)
 
         - Delegate '~user/' completion handling to Complete::Util 0.14's

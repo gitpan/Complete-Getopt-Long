@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-12-05'; # DATE
-our $VERSION = '0.18'; # VERSION
+our $DATE = '2014-12-20'; # DATE
+our $VERSION = '0.19'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ sub _default_completion {
         # if empty, fallback to searching file
     }
 
-    # try completion '~/blah' or '~foo/blah' as if completing file, but do not
+    # try completing '~/blah' or '~foo/blah' as if completing file, but do not
     # expand ~foo (this is supported by complete_file(), so we just give it off
     # to the routine)
     if ($word =~ m!\A(~[^/]*)/!) {
@@ -87,8 +87,10 @@ sub _default_completion {
 # return the key/element if $opt matches exactly a key/element in $opts (which
 # can be an array/hash) OR expands unambiguously to exactly one key/element in
 # $opts, otherwise return undef. e.g. _expand1('--fo', [qw/--foo --bar --baz
-# --fee --feet/]) and _expand('--fee') is true, but _expand1('--ba', ...) or
-# _expand1('--qux', ...) are undef.
+# --fee --feet/]) and _expand('--fee', ...) will respectively return '--foo' and
+# '--fee' because it expands/is unambiguous in the list, but _expand1('--ba',
+# ...) or _expand1('--qux', ...) will both return undef because '--ba' expands
+# ambiguously (--bar/--baz) while '--qux' cannot be expanded.
 sub _expand1 {
     my ($opt, $opts) = @_;
     my @candidates;
@@ -143,23 +145,32 @@ _
             schema      => 'code*',
             description => <<'_',
 
-Completion code will receive a hash of arguments containing these keys:
+Completion code will receive a hash of arguments (`%args`) containing these
+keys:
 
-* `type` (str, what is being completed, either `optname`, `optval`, or `arg`)
+* `type` (str, what is being completed, either `optval`, or `arg`)
 * `word` (str, word to be completed)
+* `cword` (int, position of words in the words array, starts from 0)
 * `opt` (str, option name, e.g. `--str`; undef if we're completing argument)
 * `ospec` (str, Getopt::Long option spec, e.g. `str|S=s`; undef when completing
   argument)
-* `argpos` (int, argument position, zero-based; undef if completing option)
-* `extras`
+* `argpos` (int, argument position, zero-based; undef if type='optval')
+* `nth` (int, the number of times this option has seen before, starts from 0
+  that means this is the first time this option has been seen; undef when
+  type='arg')
 * `seen_opts` (hash, all the options seen in `words`)
 
-and is expected to return a completion reply in the form of array. The various
-`complete_*` function like those in `Complete::Util` or the other `Complete::*`
-modules are suitable to use here.
+as well as all keys from `extras` (but these won't override the above keys).
 
-Code can also return undef, in which the default completion routine is called.
-It completes from environment variables (`$foo`), usernames (`~foo`), and files.
+and is expected to return a completion answer structure as described in
+`Complete` which is either a hash or an array. The simplest form of answer is
+just to return an array of strings. The various `complete_*` function like those
+in `Complete::Util` or the other `Complete::*` modules are suitable to use here.
+
+Completion routine can also return undef to express declination, in which case
+the default completion routine will then be consulted. The default routine
+completes from shell environment variables (`$FOO`), Unix usernames (`~foo`),
+and files/directories.
 
 Example:
 
@@ -209,8 +220,15 @@ _
             req         => 1,
         },
         extras => {
-            summary => 'To pass extra arguments to completion routines',
+            summary => 'Add extra arguments to completion routine',
             schema  => 'hash',
+            description => <<'_',
+
+The keys from this `extras` hash will be merged into the final `%args` passed to
+completion routines. Note that standard keys like `type`, `word`, and so on as
+described in the function description will not be overwritten by this.
+
+_
         },
     },
     result_naked => 1,
@@ -237,27 +255,7 @@ sub complete_cli_arg {
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
     my $comp0 = $args{completion};
     my $comp = $comp0 // \&_default_completion;
-    my $extras = $args{extras};
-
-    # before v0.06, completion is a hash, we'll support this for a while
-    if (ref($comp) eq 'HASH') {
-        $comp = sub {
-            my %cargs = @_;
-            my $type  = $cargs{type};
-            my $ospec = $cargs{ospec} // '';
-            my $word  = $cargs{word};
-            for my $k (keys %$comp0) {
-                my $v = $comp0->{$k};
-                next unless $k eq '' ? $type eq 'arg' : $k eq $ospec;
-                if (ref($v) eq 'ARRAY') {
-                    return Complete::Util::complete_array_elem(
-                        word=>$word, array=>$v);
-                } else {
-                    return $v->(%cargs);
-                }
-            }
-        };
-    }
+    my $extras = $args{extras} // {};
 
     # parse all options first & supply default completion routine
     my %opts;
@@ -467,10 +465,10 @@ sub complete_cli_arg {
         my $opt = $exp->{optval};
         my $opthash = $opts{$opt} if $opt;
         my %compargs = (
+            %$extras,
             type=>'optval', words=>$args{words}, cword=>$args{cword},
             word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
-            argpos=>undef, extras=>$extras, nth=>$exp->{nth},
-            seen_opts=>\%seen_opts,
+            argpos=>undef, nth=>$exp->{nth}, seen_opts=>\%seen_opts,
         );
         my $compres = $comp->(%compargs);
         if (!defined $compres) {
@@ -488,9 +486,10 @@ sub complete_cli_arg {
     {
         last unless exists($exp->{arg});
         my %compargs = (
+            %$extras,
             type=>'arg', words=>$args{words}, cword=>$args{cword},
             word=>$word, opt=>undef, ospec=>undef,
-            argpos=>$exp->{argpos}, extras=>$extras, seen_opts=>\%seen_opts,
+            argpos=>$exp->{argpos}, seen_opts=>\%seen_opts,
         );
         my $compres = $comp->(%compargs);
         if (!defined $compres) {
@@ -508,7 +507,7 @@ sub complete_cli_arg {
 }
 
 1;
-#ABSTRACT: Complete command-line argument using Getopt::Long specification
+# ABSTRACT: Complete command-line argument using Getopt::Long specification
 
 __END__
 
@@ -522,7 +521,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.18 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-05.
+This document describes version 0.19 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-20.
 
 =head1 SYNOPSIS
 
@@ -556,33 +555,43 @@ Arguments ('*' denotes required arguments):
 
 Completion routine to complete option value/argument.
 
-Completion code will receive a hash of arguments containing these keys:
+Completion code will receive a hash of arguments (C<%args>) containing these
+keys:
 
 =over
 
-=item * C<type> (str, what is being completed, either C<optname>, C<optval>, or C<arg>)
+=item * C<type> (str, what is being completed, either C<optval>, or C<arg>)
 
 =item * C<word> (str, word to be completed)
+
+=item * C<cword> (int, position of words in the words array, starts from 0)
 
 =item * C<opt> (str, option name, e.g. C<--str>; undef if we're completing argument)
 
 =item * C<ospec> (str, Getopt::Long option spec, e.g. C<str|S=s>; undef when completing
 argument)
 
-=item * C<argpos> (int, argument position, zero-based; undef if completing option)
+=item * C<argpos> (int, argument position, zero-based; undef if type='optval')
 
-=item * C<extras>
+=item * C<nth> (int, the number of times this option has seen before, starts from 0
+that means this is the first time this option has been seen; undef when
+type='arg')
 
 =item * C<seen_opts> (hash, all the options seen in C<words>)
 
 =back
 
-and is expected to return a completion reply in the form of array. The various
-C<complete_*> function like those in C<Complete::Util> or the other C<Complete::*>
-modules are suitable to use here.
+as well as all keys from C<extras> (but these won't override the above keys).
 
-Code can also return undef, in which the default completion routine is called.
-It completes from environment variables (C<$foo>), usernames (C<~foo>), and files.
+and is expected to return a completion answer structure as described in
+C<Complete> which is either a hash or an array. The simplest form of answer is
+just to return an array of strings. The various C<complete_*> function like those
+in C<Complete::Util> or the other C<Complete::*> modules are suitable to use here.
+
+Completion routine can also return undef to express declination, in which case
+the default completion routine will then be consulted. The default routine
+completes from shell environment variables (C<$FOO>), Unix usernames (C<~foo>),
+and files/directories.
 
 Example:
 
@@ -615,7 +624,11 @@ you're using bash).
 
 =item * B<extras> => I<hash>
 
-To pass extra arguments to completion routines.
+Add extra arguments to completion routine.
+
+The keys from this C<extras> hash will be merged into the final C<%args> passed to
+completion routines. Note that standard keys like C<type>, C<word>, and so on as
+described in the function description will not be overwritten by this.
 
 =item * B<getopt_spec>* => I<hash>
 
@@ -657,7 +670,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 
