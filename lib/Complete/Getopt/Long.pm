@@ -1,12 +1,14 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-12-20'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2014-12-24'; # DATE
+our $VERSION = '0.20'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::Any '$log';
+
+#use Complete;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -28,7 +30,7 @@ sub _default_completion {
         require Complete::Util;
         {
             my $compres = Complete::Util::complete_env(
-                word=>$word, ci=>1);
+                word=>$word);
             last unless @$compres;
             return {words=>$compres, escmode=>'shellvar'};
         }
@@ -46,7 +48,7 @@ sub _default_completion {
             my $compres = Complete::Util::complete_array(
                 array=>[map {"~" . $_->{user} . ((-d $_->{home}) ? "/":"")}
                             @{ $res->[2] }],
-                word=>$word, ci=>1,
+                word=>$word,
             );
             last unless @$compres;
             return {words=>$compres, path_sep=>'/'};
@@ -59,7 +61,7 @@ sub _default_completion {
     # to the routine)
     if ($word =~ m!\A(~[^/]*)/!) {
         $log->tracef("completing file");
-        return {words=>Complete::Util::complete_file(word=>$word, ci=>1),
+        return {words=>Complete::Util::complete_file(word=>$word),
                 path_sep=>'/'};
     }
 
@@ -80,7 +82,7 @@ sub _default_completion {
         # if empty, fallback to searching file
     }
     $log->tracef("completing with file");
-    return {words=>Complete::Util::complete_file(word=>$word, ci=>1),
+    return {words=>Complete::Util::complete_file(word=>$word),
             path_sep=>'/'};
 }
 
@@ -521,13 +523,16 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.19 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-20.
+This document describes version 0.20 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-24.
 
 =head1 SYNOPSIS
 
 See L<Getopt::Long::Complete> for an easy way to use this module.
 
 =head1 DESCRIPTION
+
+Note that I deliberately do not support C<ci> (case-insensitive) option here.
+Options that differ only in case often are often and they mean different things.
 
 =head1 FUNCTIONS
 
@@ -650,6 +655,12 @@ Return value:
 You can use C<format_completion> function in C<Complete::Bash> module to format
 the result of this function for bash.
 
+=head1 TODO
+
+Handle redirection and other bash syntax. When command-line is 'foo 1 2
+</some/path' bash will supply COMP_WORDS as (foo 1 2 < /some/path). We currently
+do not yet specifically handle this.
+
 =head1 SEE ALSO
 
 L<Getopt::Long::Complete>
@@ -670,7 +681,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 

@@ -1,5 +1,13 @@
 Revision history for Complete-Getopt-Long
 
+0.20    2014-12-24 (PERLANCAR)
+
+	- Add note that we deliberately do not provide 'ci' option in this
+	  module.
+
+	- Follow convention of Complete 0.06.
+
+
 0.19    2014-12-20 (PERLANCAR)
 
         [REMOVED FEATURES]
