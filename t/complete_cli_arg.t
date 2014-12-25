@@ -70,11 +70,11 @@ subtest basics => sub {
     );
     test_complete(
         name        => 'option name with mentioned non-repeatable option (alias)',
-        args        => {getopt_spec=>\%gospec, },
+        args        => {getopt_spec=>\%gospec},
         comp_line0  => 'CMD --flag1 -^', # means -1 is also mentioned
         result      => {words=>
                             [qw/--bool --flag2 --float --int --no-bool
-                                --nobool --str -F -S -f/],
+                                --nobool --str -F -f -S/],
                         escmode=>'option'},
     );
     test_complete(
@@ -83,7 +83,7 @@ subtest basics => sub {
         comp_line0  => 'CMD -^  --flag1', # ditto
         result      => {words=>
                             [qw/--bool --flag2 --float --int --no-bool
-                                --nobool --str -F -S -f/],
+                                --nobool --str -F -f -S/],
                         escmode=>'option'},
     );
     test_complete(
@@ -144,7 +144,7 @@ subtest basics => sub {
         comp_line0  => 'CMD -^',
         result      => {words=>
                             [qw/--bool --flag1 --flag2 --float --int --no-bool
-                                --nobool --str -1 -F -S -f/],
+                                --nobool --str -1 -F -f -S/],
                         escmode=>'option'},
     );
 
