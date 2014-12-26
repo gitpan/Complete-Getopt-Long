@@ -1,21 +1,143 @@
-SYNOPSIS
+NAME
+    Complete::Getopt::Long - Complete command-line argument using
+    Getopt::Long specification
 
+VERSION
+    This document describes version 0.22 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-12-26.
+
+SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
 
 DESCRIPTION
-
-    Note that I deliberately do not support ci (case-insensitive) option
+    Note that I deliberately do not support "ci" (case-insensitive) option
     here. Options that differ only in case often are often and they mean
     different things.
 
-TODO
+FUNCTIONS
+  complete_cli_arg(%args) -> array|hash
+    Complete command-line argument using Getopt::Long specification.
 
+    This routine can complete option names, where the option names are
+    retrieved from "Getopt::Long" specification. If you provide completion
+    routine in "completion", you can also complete *option values* and
+    *arguments*.
+
+    Note that this routine does not use "Getopt::Long" (it does its own
+    parsing) and currently is not affected by Getopt::Long's configuration.
+    Its behavior mimics Getopt::Long under these configuration: "bundling",
+    "no_ignore_case". Which I think is the sensible default. This routine
+    also does not currently support "auto_help" and "auto_version", so
+    you'll need to add those options specifically if you want to recognize
+    "--help/-?" and "--version", respectively.
+
+    Arguments ('*' denotes required arguments):
+
+    *   completion => *code*
+
+        Completion routine to complete option value/argument.
+
+        Completion code will receive a hash of arguments (%args) containing
+        these keys:
+
+        *   "type" (str, what is being completed, either "optval", or "arg")
+
+        *   "word" (str, word to be completed)
+
+        *   "cword" (int, position of words in the words array, starts from
+            0)
+
+        *   "opt" (str, option name, e.g. "--str"; undef if we're completing
+            argument)
+
+        *   "ospec" (str, Getopt::Long option spec, e.g. "str|S=s"; undef
+            when completing argument)
+
+        *   "argpos" (int, argument position, zero-based; undef if
+            type='optval')
+
+        *   "nth" (int, the number of times this option has seen before,
+            starts from 0 that means this is the first time this option has
+            been seen; undef when type='arg')
+
+        *   "seen_opts" (hash, all the options seen in "words")
+
+        as well as all keys from "extras" (but these won't override the
+        above keys).
+
+        and is expected to return a completion answer structure as described
+        in "Complete" which is either a hash or an array. The simplest form
+        of answer is just to return an array of strings. The various
+        "complete_*" function like those in "Complete::Util" or the other
+        "Complete::*" modules are suitable to use here.
+
+        Completion routine can also return undef to express declination, in
+        which case the default completion routine will then be consulted.
+        The default routine completes from shell environment variables
+        ($FOO), Unix usernames ("~foo"), and files/directories.
+
+        Example:
+
+         use Complete::Unix qw(complete_user);
+         use Complete::Util qw(complete_array_elem);
+         complete_cli_arg(
+             getopt_spec => {
+                 'help|h'   => sub{...},
+                 'format=s' => \$format,
+                 'user=s'   => \$user,
+             },
+             completion  => sub {
+                 my %args  = @_;
+                 my $word  = $args{word};
+                 my $ospec = $args{ospec};
+                 if ($ospec && $ospec eq 'format=s') {
+                     complete_array(array=>[qw/json text xml yaml/], word=>$word);
+                 } else {
+                     complete_user(word=>$word);
+                 }
+             },
+         );
+
+    *   cword* => *int*
+
+        Index in words of the word we're trying to complete.
+
+        See function "parse_cmdline" in "Complete::Bash" on how to produce
+        this (if you're using bash).
+
+    *   extras => *hash*
+
+        Add extra arguments to completion routine.
+
+        The keys from this "extras" hash will be merged into the final %args
+        passed to completion routines. Note that standard keys like "type",
+        "word", and so on as described in the function description will not
+        be overwritten by this.
+
+    *   getopt_spec* => *hash*
+
+        Getopt::Long specification.
+
+    *   words* => *array*
+
+        Command line arguments, like @ARGV.
+
+        See function "parse_cmdline" in "Complete::Bash" on how to produce
+        this (if you're using bash).
+
+    Return value:
+
+     (any)
+
+    You can use "format_completion" function in "Complete::Bash" module to
+    format the result of this function for bash.
+
+TODO
     Handle redirection and other bash syntax. When command-line is 'foo 1 2
     </some/path' bash will supply COMP_WORDS as (foo 1 2 < /some/path). We
     currently do not yet specifically handle this.
 
 SEE ALSO
-
     Getopt::Long::Complete
 
     Complete
@@ -27,4 +149,28 @@ SEE ALSO
 
     Perinci::CmdLine - an alternative way to easily create command-line
     applications with completion feature.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Getopt-Long>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Getopt-Long>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

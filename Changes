@@ -1,5 +1,13 @@
 Revision history for Complete-Getopt-Long
 
+0.22    2014-12-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak logging messages to make it easier to debug (preparing
+	  peri-test-comp).
+
+
 0.21    2014-12-25 (PERLANCAR)
 
         - No functional changes.
