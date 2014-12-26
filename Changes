@@ -1,5 +1,13 @@
 Revision history for Complete-Getopt-Long
 
+0.23    2014-12-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak logging message, exclude extras (too long, in
+	  Perinci::CmdLine it contains 'cmdline' object).
+
+
 0.22    2014-12-26 (PERLANCAR)
 
 	- No functional changes.

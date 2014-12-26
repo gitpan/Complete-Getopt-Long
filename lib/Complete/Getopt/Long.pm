@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-12-26'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
@@ -259,9 +259,9 @@ sub complete_cli_arg {
     my $comp = $comp0 // \&_default_completion;
     my $extras = $args{extras} // {};
 
-    $log->tracef('[comp][compgl] entering %s::%s(), words=%s, cword=%d, word=<%s>, extras=%s',
+    $log->tracef('[comp][compgl] entering %s::%s(), words=%s, cword=%d, word=<%s>',
                  __PACKAGE__, "complete_cli_arg", \@words, $cword,
-                 $words[$cword], $extras); # XXX use __SUB__
+                 $words[$cword]); # XXX use __SUB__
 
     # parse all options first & supply default completion routine
     my %opts;
@@ -540,7 +540,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.22 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-26.
+This document describes version 0.23 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-26.
 
 =head1 SYNOPSIS
 
