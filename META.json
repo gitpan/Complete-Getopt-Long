@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Getopt-Long"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018002"
@@ -269,7 +269,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.25"
+                        "version" : "0.26"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",

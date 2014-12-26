@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long
   homepage: https://metacpan.org/release/Complete-Getopt-Long
   repository: git://github.com/perlancar/perl-Complete-Getopt-Long.git
-version: '0.23'
+version: '0.24'
 x_Dist_Zilla:
   perl:
     version: '5.018002'
@@ -197,7 +197,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.25'
+              version: '0.26'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'

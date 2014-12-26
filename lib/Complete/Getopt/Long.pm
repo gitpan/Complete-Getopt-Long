@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-12-26'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2014-12-27'; # DATE
+our $VERSION = '0.24'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,6 +22,7 @@ sub _default_completion {
     my %args = @_;
     my $word = $args{word} // '';
 
+    my $fres;
     $log->tracef('[comp][compgl] entering default completion routine');
 
     # try completing '$...' with shell variables
@@ -32,7 +33,8 @@ sub _default_completion {
             my $compres = Complete::Util::complete_env(
                 word=>$word);
             last unless @$compres;
-            return {words=>$compres, escmode=>'shellvar'};
+            $fres = {words=>$compres, escmode=>'shellvar'};
+            goto RETURN_RES;
         }
         # if empty, fallback to searching file
     }
@@ -51,7 +53,8 @@ sub _default_completion {
                 word=>$word,
             );
             last unless @$compres;
-            return {words=>$compres, path_sep=>'/'};
+            $fres = {words=>$compres, path_sep=>'/'};
+            goto RETURN_RES;
         }
         # if empty, fallback to searching file
     }
@@ -61,8 +64,9 @@ sub _default_completion {
     # to the routine)
     if ($word =~ m!\A(~[^/]*)/!) {
         $log->tracef("[comp][compgl] completing file, path=<%s>", $word);
-        return {words=>Complete::Util::complete_file(word=>$word),
-                path_sep=>'/'};
+        $fres = {words=>Complete::Util::complete_file(word=>$word),
+                 path_sep=>'/'};
+        goto RETURN_RES;
     }
 
     # try completing something that contains wildcard with glob. for
@@ -77,13 +81,17 @@ sub _default_completion {
             for (@$compres) {
                 $_ .= "/" if (-d $_);
             }
-            return {words=>$compres, path_sep=>'/'};
+            $fres = {words=>$compres, path_sep=>'/'};
+            goto RETURN_RES;
         }
         # if empty, fallback to searching file
     }
     $log->tracef("[comp][compgl] completing with file, file=<%s>", $word);
-    return {words=>Complete::Util::complete_file(word=>$word),
-            path_sep=>'/'};
+    $fres = {words=>Complete::Util::complete_file(word=>$word),
+             path_sep=>'/'};
+  RETURN_RES:
+    $log->tracef("[comp][compgl] leaving default completion routine, result=%s", $fres);
+    $fres;
 }
 
 # return the key/element if $opt matches exactly a key/element in $opts (which
@@ -251,17 +259,18 @@ sub complete_cli_arg {
 
     my %args = @_;
 
+    my $fname = __PACKAGE__ . "::complete_cli_arg"; # XXX use __SUB__
+    my $fres;
+
     $args{words} or die "Please specify words";
     my @words = @{ $args{words} };
     defined(my $cword = $args{cword}) or die "Please specify cword";
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
-    my $comp0 = $args{completion};
-    my $comp = $comp0 // \&_default_completion;
+    my $comp = $args{completion};
     my $extras = $args{extras} // {};
 
-    $log->tracef('[comp][compgl] entering %s::%s(), words=%s, cword=%d, word=<%s>',
-                 __PACKAGE__, "complete_cli_arg", \@words, $cword,
-                 $words[$cword]); # XXX use __SUB__
+    $log->tracef('[comp][compgl] entering %s(), words=%s, cword=%d, word=<%s>',
+                 $fname, \@words, $cword, $words[$cword]);
 
     # parse all options first & supply default completion routine
     my %opts;
@@ -464,8 +473,10 @@ sub complete_cli_arg {
         $log->tracef('[comp][compgl] adding result from option names, '.
                          'matching options=%s', $compres);
         push @res, @$compres;
-        return {words=>\@res, escmode=>'option'}
-            if !exists($exp->{optval}) && !exists($exp->{arg});
+        if (!exists($exp->{optval}) && !exists($exp->{arg})) {
+            $fres = {words=>\@res, escmode=>'option'};
+            goto RETURN_RES;
+        }
     }
 
     # complete option value
@@ -479,20 +490,24 @@ sub complete_cli_arg {
             word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
             argpos=>undef, nth=>$exp->{nth}, seen_opts=>\%seen_opts,
         );
-        $log->tracef('[comp][compgl] invoking \'completion\' routine '.
-                         'to complete option value, option=<%s>', $opt);
-        my $compres = $comp->(%compargs);
-        $log->tracef('[comp][compgl] adding result from \'completion\' '.
-                         'routine: %s', $compres);
-        if (!defined $compres) {
+        my $compres;
+        if ($comp) {
+            $log->tracef("[comp][compgl] invoking routine supplied from 'completion' argument to complete option value, option=<%s>", $opt);
+            $compres = $comp->(%compargs);
+            $log->tracef('[comp][compgl] adding result from routine: %s', $compres);
+        }
+        if (!$compres || !$comp) {
             $compres = _default_completion(%compargs);
             $log->tracef('[comp][compgl] adding result from default '.
-                             'completion routine: %s', $compres);
+                             'completion routine');
         }
         if (ref($compres) eq 'ARRAY') {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
-            return $compres unless @res;
+            unless (@res) {
+                $fres = $compres;
+                goto RETURN_RES;
+            }
             push @res, @{ $compres->{words} // [] };
         }
     }
@@ -517,12 +532,18 @@ sub complete_cli_arg {
         if (ref($compres) eq 'ARRAY') {
             push @res, @$compres;
         } elsif (ref($compres) eq 'HASH') {
-            return $compres unless @res;
+            unless (@res) {
+                $fres = $compres;
+                goto RETURN_RES;
+            }
             push @res, @{ $compres->{words} // [] };
         }
     }
 
-    [sort(List::MoreUtils::uniq(@res))];
+    $fres = [sort(List::MoreUtils::uniq(@res))];
+  RETURN_RES:
+    $log->tracef("[comp][compgl] leaving %s(), result=%s", $fname, $fres);
+    $fres;
 }
 
 1;
@@ -540,7 +561,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.23 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-26.
+This document describes version 0.24 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-27.
 
 =head1 SYNOPSIS
 
