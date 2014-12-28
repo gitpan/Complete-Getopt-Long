@@ -1,5 +1,11 @@
 Revision history for Complete-Getopt-Long
 
+0.26    2014-12-29 (PERLANCAR)
+
+	- Split --foo=val, some fixes in producing 'parsed_opts' for
+	  completion routine.
+
+
 0.25    2014-12-28 (PERLANCAR)
 
 	- Provide 'parsed_opts' for completion routine.
