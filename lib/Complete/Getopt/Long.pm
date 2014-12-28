@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
 our $DATE = '2014-12-29'; # DATE
-our $VERSION = '0.26'; # VERSION
+our $VERSION = '0.27'; # VERSION
 
 use 5.010001;
 use strict;
@@ -373,6 +373,7 @@ sub complete_cli_arg {
                 if ($word =~ /\A(--[^=]+)(=)(.*)/) {
                     splice @words, $i, 1, $1, $2, $3;
                     $word = $1;
+                    $cword += 2 if $cword >= $i;
                 }
             }
 
@@ -499,7 +500,7 @@ sub complete_cli_arg {
         my $opthash = $opts{$opt} if $opt;
         my %compargs = (
             %$extras,
-            type=>'optval', words=>$args{words}, cword=>$args{cword},
+            type=>'optval', words=>\@words, cword=>$args{cword},
             word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
             argpos=>undef, nth=>$exp->{nth}, seen_opts=>\%seen_opts,
             parsed_opts=>\%parsed_opts,
@@ -531,7 +532,7 @@ sub complete_cli_arg {
         last unless exists($exp->{arg});
         my %compargs = (
             %$extras,
-            type=>'arg', words=>$args{words}, cword=>$args{cword},
+            type=>'arg', words=>\@words, cword=>$args{cword},
             word=>$word, opt=>undef, ospec=>undef,
             argpos=>$exp->{argpos}, seen_opts=>\%seen_opts,
             parsed_opts=>\%parsed_opts,
@@ -576,7 +577,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.26 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2015-12-29.
+This document describes version 0.27 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2015-12-29.
 
 =head1 SYNOPSIS
 
