@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.24 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2014-12-27.
+    This document describes version 0.25 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2014-12-28.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -61,6 +61,8 @@ FUNCTIONS
             been seen; undef when type='arg')
 
         *   "seen_opts" (hash, all the options seen in "words")
+
+        *   "parsed_opts" (hash, options parsed the standard way)
 
         as well as all keys from "extras" (but these won't override the
         above keys).
@@ -156,7 +158,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Complete-Getopt-Long>.
+    <https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

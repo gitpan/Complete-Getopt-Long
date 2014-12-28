@@ -32,8 +32,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Getopt-Long
   homepage: https://metacpan.org/release/Complete-Getopt-Long
-  repository: git://github.com/perlancar/perl-Complete-Getopt-Long.git
-version: '0.24'
+  repository: git://github.com/sharyanto/perl-Complete-Getopt-Long.git
+version: '0.25'
 x_Dist_Zilla:
   perl:
     version: '5.018002'
@@ -153,47 +153,47 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
@@ -201,11 +201,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -213,7 +213,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Completion::PerinciCmdLine
               name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.08'
+              version: '0.09'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -229,11 +229,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.009'
+              version: '4.008'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
@@ -241,7 +241,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.009'
+              version: '4.008'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.006'
     -

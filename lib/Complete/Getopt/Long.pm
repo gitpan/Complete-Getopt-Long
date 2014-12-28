@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-12-27'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2014-12-28'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
 use strict;
@@ -169,6 +169,7 @@ keys:
   that means this is the first time this option has been seen; undef when
   type='arg')
 * `seen_opts` (hash, all the options seen in `words`)
+* `parsed_opts` (hash, options parsed the standard way)
 
 as well as all keys from `extras` (but these won't override the above keys).
 
@@ -268,6 +269,7 @@ sub complete_cli_arg {
     my $gospec = $args{getopt_spec} or die "Please specify getopt_spec";
     my $comp = $args{completion};
     my $extras = $args{extras} // {};
+    my %parsed_opts;
 
     $log->tracef('[comp][compgl] entering %s(), words=%s, cword=%d, word=<%s>',
                  $fname, \@words, $cword, $words[$cword]);
@@ -387,6 +389,7 @@ sub complete_cli_arg {
                     if (!$max_vals) { $min_vals = $max_vals = 1 }
                 }
 
+                push @{ $parsed_opts{$opt} }, $words[$i+1];
                 for (1 .. $min_vals) {
                     $i++;
                     last WORD if $i >= @words;
@@ -411,6 +414,7 @@ sub complete_cli_arg {
                     $expects[$i] = {separator=>1, optval=>undef, word=>''};
                     if ($i+1 < @words) {
                         $i++;
+                        push @{ $parsed_opts{$opt} }, $words[$i];
                         $expects[$i]{optval} = $opt;
                     }
                 }
@@ -520,6 +524,7 @@ sub complete_cli_arg {
             type=>'arg', words=>$args{words}, cword=>$args{cword},
             word=>$word, opt=>undef, ospec=>undef,
             argpos=>$exp->{argpos}, seen_opts=>\%seen_opts,
+            parsed_opts=>\%parsed_opts,
         );
         $log->tracef('[comp][compgl] invoking \'completion\' routine '.
                          'to complete argument');
@@ -561,7 +566,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.24 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-27.
+This document describes version 0.25 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2014-12-28.
 
 =head1 SYNOPSIS
 
@@ -621,6 +626,8 @@ that means this is the first time this option has been seen; undef when
 type='arg')
 
 =item * C<seen_opts> (hash, all the options seen in C<words>)
+
+=item * C<parsed_opts> (hash, options parsed the standard way)
 
 =back
 
@@ -719,7 +726,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-G
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Complete-Getopt-Long>.
+Source repository is at L<https://github.com/sharyanto/perl-Complete-Getopt-Long>.
 
 =head1 BUGS
 
