@@ -1,7 +1,7 @@
 package Complete::Getopt::Long;
 
-our $DATE = '2014-12-29'; # DATE
-our $VERSION = '0.27'; # VERSION
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.28'; # VERSION
 
 use 5.010001;
 use strict;
@@ -577,7 +577,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.27 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2015-12-29.
+This document describes version 0.28 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2015-01-03.
 
 =head1 SYNOPSIS
 
@@ -591,7 +591,7 @@ Options that differ only in case often are often and they mean different things.
 =head1 FUNCTIONS
 
 
-=head2 complete_cli_arg(%args) -> array|hash
+=head2 complete_cli_arg(%args) -> hash|array
 
 Complete command-line argument using Getopt::Long specification.
 
@@ -704,18 +704,10 @@ you're using bash).
 
 =back
 
-Return value:
-
- (any)
+Return value:  (hash|array)
 
 You can use C<format_completion> function in C<Complete::Bash> module to format
 the result of this function for bash.
-
-=head1 TODO
-
-Handle redirection and other bash syntax. When command-line is 'foo 1 2
-</some/path' bash will supply COMP_WORDS as (foo 1 2 < /some/path). We currently
-do not yet specifically handle this.
 
 =head1 SEE ALSO
 
@@ -753,7 +745,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

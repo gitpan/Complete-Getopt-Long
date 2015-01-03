@@ -1,5 +1,12 @@
 Revision history for Complete-Getopt-Long
 
+0.28    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
 0.27    2014-12-29 (PERLANCAR)
 
 	- [Bugfixes] A couple more fixes for providing arguments for
